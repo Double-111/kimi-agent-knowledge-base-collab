@@ -9,6 +9,7 @@ import { EntityDetail } from '@/components/EntityDetail';
 import { StatsPanel } from '@/components/StatsPanel';
 import { OntologyAnalyzer } from '@/components/OntologyAnalyzer';
 import { SystemsOntologyView } from '@/components/SystemsOntologyView';
+import { OntologyAssistant } from '@/components/OntologyAssistant';
 import { 
   BookOpen, 
   Network, 
@@ -19,7 +20,8 @@ import {
   GitBranch,
   Layers,
   Sparkles,
-  Boxes
+  Boxes,
+  MessageSquareText
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -141,10 +143,14 @@ function App() {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6 lg:w-auto lg:inline-grid">
+          <TabsList className="grid w-full grid-cols-7 lg:w-auto lg:inline-grid">
             <TabsTrigger value="browse" className="flex items-center gap-2">
               <BookOpen className="w-4 h-4" />
               <span className="hidden sm:inline">浏览</span>
+            </TabsTrigger>
+            <TabsTrigger value="assistant" className="flex items-center gap-2">
+              <MessageSquareText className="w-4 h-4" />
+              <span className="hidden sm:inline">问答</span>
             </TabsTrigger>
             <TabsTrigger value="analyzer" className="flex items-center gap-2">
               <Sparkles className="w-4 h-4" />
@@ -189,6 +195,10 @@ function App() {
                 />
               </div>
             </div>
+          </TabsContent>
+
+          <TabsContent value="assistant" className="space-y-6">
+            <OntologyAssistant selectedEntity={selectedEntity} />
           </TabsContent>
 
           <TabsContent value="analyzer" className="space-y-6">

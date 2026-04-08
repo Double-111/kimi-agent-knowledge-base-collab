@@ -6,7 +6,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import type { Entity } from '@/types/ontology';
 
 interface SearchPanelProps {
-  onSearch: (query: string) => Entity[];
+  onSearch: (query: string) => Promise<Entity[]>;
   onSelectEntity: (entity: Entity) => void;
 }
 
@@ -14,22 +14,28 @@ export function SearchPanel({ onSearch, onSelectEntity }: SearchPanelProps) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<Entity[]>([]);
   const [showResults, setShowResults] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleSearch = useCallback((searchQuery: string) => {
-    setQuery(searchQuery);
+  const handleSearch = useCallback(async (searchQuery: string) => {
     if (searchQuery.trim()) {
-      const searchResults = onSearch(searchQuery);
-      setResults(searchResults);
-      setShowResults(true);
+      setLoading(true);
+      try {
+        const searchResults = await onSearch(searchQuery);
+        setResults(searchResults);
+        setShowResults(true);
+      } finally {
+        setLoading(false);
+      }
     } else {
       setResults([]);
       setShowResults(false);
+      setLoading(false);
     }
   }, [onSearch]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      handleSearch(query);
+      void handleSearch(query);
     }, 300);
 
     return () => clearTimeout(timer);
@@ -56,7 +62,7 @@ export function SearchPanel({ onSearch, onSelectEntity }: SearchPanelProps) {
             type="text"
             placeholder="搜索实体、定义、领域..."
             value={query}
-            onChange={(e) => handleSearch(e.target.value)}
+            onChange={(e) => setQuery(e.target.value)}
             className="pl-10 pr-10"
           />
           {query && (
@@ -101,6 +107,12 @@ export function SearchPanel({ onSearch, onSelectEntity }: SearchPanelProps) {
               ))}
             </div>
           </ScrollArea>
+        </div>
+      )}
+
+      {loading && query && (
+        <div className="absolute top-full left-0 right-0 mt-2 bg-popover border rounded-lg shadow-lg z-50 p-4 text-center text-muted-foreground">
+          搜索中...
         </div>
       )}
 
