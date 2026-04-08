@@ -51,3 +51,94 @@ export async function askOntologyAssistant(input: {
 
   return parseJson(response);
 }
+
+export interface AnalysisResult {
+  entity_name: string;
+  primary_level: string;
+  secondary_levels: string[];
+  ontology_breakdown: {
+    entity_level: {
+      main_level: string;
+      physical_basis: string;
+      social_dimension?: string;
+    };
+    essential_attributes: Array<{
+      attribute: string;
+      description: string;
+      necessity: string;
+    }>;
+    accidental_attributes: Array<{
+      attribute: string;
+      examples: string[];
+    }>;
+    components: Array<{
+      part: string;
+      function: string;
+      material?: string;
+      ontology_relation: string;
+    }>;
+    relations: Array<{
+      relation: string;
+      target: string;
+      description: string;
+    }>;
+    ontological_questions: Array<{
+      question: string;
+      discussion: string;
+    }>;
+    formalization: {
+      RDF?: string;
+      OWL?: string;
+      description_logic?: string;
+    };
+  };
+}
+
+export interface SystemAnalysisData {
+  entity: string;
+  holistic_properties: string[];
+  boundary: {
+    physical?: string;
+    functional?: string;
+    cognitive?: string;
+    dynamic?: string;
+  };
+  environment: {
+    description: string;
+    inputs: string[];
+    outputs: string[];
+  };
+  feedback: {
+    negative: string[];
+    positive: string[];
+  };
+  hierarchy: {
+    subsystems: string[];
+    supersystems: string[];
+  };
+  emergence_examples: string[];
+  systems_questions: Array<{
+    question: string;
+    analysis: string;
+  }>;
+}
+
+export async function fetchAnalysis(query: string, entityId?: string): Promise<AnalysisResult> {
+  const params = new URLSearchParams({ q: query });
+  if (entityId) {
+    params.set('entityId', entityId);
+  }
+
+  const response = await fetch(`${API_BASE}/api/analysis?${params.toString()}`);
+  return parseJson<AnalysisResult>(response);
+}
+
+export async function fetchSystemAnalysis(query: string, entityId?: string): Promise<SystemAnalysisData> {
+  const params = new URLSearchParams({ q: query });
+  if (entityId) {
+    params.set('entityId', entityId);
+  }
+
+  const response = await fetch(`${API_BASE}/api/system-analysis?${params.toString()}`);
+  return parseJson<SystemAnalysisData>(response);
+}

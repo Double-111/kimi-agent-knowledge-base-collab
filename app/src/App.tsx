@@ -209,7 +209,7 @@ function App() {
           </TabsContent>
 
           <TabsContent value="systems" className="space-y-6">
-            <SystemsOntologyView />
+            <SystemsOntologyView selectedEntity={selectedEntity} />
           </TabsContent>
 
           <TabsContent value="graph" className="space-y-6">
