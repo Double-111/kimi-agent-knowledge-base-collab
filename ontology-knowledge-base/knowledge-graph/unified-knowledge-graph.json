@@ -1,0 +1,1443 @@
+{
+  "metadata": {
+    "title": "本体论知识图谱",
+    "created_by": "知识工程师",
+    "version": "1.0",
+    "description": "整合哲学、形式、科学本体论的统一知识图谱",
+    "sources": [
+      "philosophical-ontology.json",
+      "formal-ontology.json",
+      "scientific-ontology.json"
+    ]
+  },
+  "statistics": {
+    "total_entities": 63,
+    "total_relations": 8,
+    "domains": [
+      "关系论",
+      "存在论",
+      "属性论",
+      "形而上学基本问题",
+      "范畴论",
+      "过程与变化"
+    ],
+    "levels": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "sources": [
+      "哲学本体论",
+      "形式本体论",
+      "科学本体论"
+    ]
+  },
+  "entity_index": {
+    "phil_存在_being": {
+      "id": "phil_存在_being",
+      "name": "存在",
+      "type": "哲学概念",
+      "domain": "存在论",
+      "source": "philosophical-ontology",
+      "definition": "一切可言说、可思考者的最基本规定",
+      "properties": {
+        "types": [
+          "现实存在",
+          "可能存在",
+          "必然存在",
+          "偶然存在"
+        ],
+        "references": [
+          "巴门尼德",
+          "亚里士多德《形而上学》",
+          "海德格尔《存在与时间》"
+        ]
+      }
+    },
+    "phil_实体_substance": {
+      "id": "phil_实体_substance",
+      "name": "实体",
+      "type": "哲学概念",
+      "domain": "存在论",
+      "source": "philosophical-ontology",
+      "definition": "独立自存、不依赖于其他事物而存在的东西",
+      "properties": {
+        "types": [
+          "初级实体（个体）",
+          "次级实体（种属）"
+        ],
+        "properties": [
+          "独立性",
+          "统一性",
+          "持续性"
+        ]
+      }
+    },
+    "phil_个体_individual": {
+      "id": "phil_个体_individual",
+      "name": "个体",
+      "type": "哲学概念",
+      "domain": "存在论",
+      "source": "philosophical-ontology",
+      "definition": "具体的、独特的、不可重复的存在者",
+      "properties": {
+        "examples": [
+          "这个苹果",
+          "苏格拉底",
+          "地球"
+        ],
+        "criteria": [
+          "时空定位",
+          "特定属性组合",
+          "身份同一性"
+        ]
+      }
+    },
+    "phil_共相_universal": {
+      "id": "phil_共相_universal",
+      "name": "共相",
+      "type": "哲学概念",
+      "domain": "存在论",
+      "source": "philosophical-ontology",
+      "definition": "可被多个个体分享的共同性质或形式",
+      "properties": {
+        "problem": "共相问题（唯名论 vs 实在论）",
+        "positions": [
+          "极端唯名论",
+          "概念论",
+          "温和实在论",
+          "极端实在论"
+        ]
+      }
+    },
+    "phil_变化_change": {
+      "id": "phil_变化_change",
+      "name": "变化",
+      "type": "哲学概念",
+      "domain": "过程与变化",
+      "source": "philosophical-ontology",
+      "definition": "",
+      "properties": {
+        "types": [
+          "实体变化（生成与毁灭）",
+          "性质变化（质变）",
+          "量变化（增减）",
+          "位置变化（运动）"
+        ],
+        "paradoxes": [
+          "芝诺悖论",
+          "飞矢不动"
+        ]
+      }
+    },
+    "phil_时间_time": {
+      "id": "phil_时间_time",
+      "name": "时间",
+      "type": "哲学概念",
+      "domain": "过程与变化",
+      "source": "philosophical-ontology",
+      "definition": "",
+      "properties": {
+        "nature": [
+          "A理论（动态）",
+          "B理论（静态）"
+        ],
+        "topology": [
+          "线性",
+          "分支",
+          "循环"
+        ],
+        "ontology": [
+          "现在主义",
+          "永恒主义",
+          "增长块理论"
+        ]
+      }
+    },
+    "phil_空间_space": {
+      "id": "phil_空间_space",
+      "name": "空间",
+      "type": "哲学概念",
+      "domain": "过程与变化",
+      "source": "philosophical-ontology",
+      "definition": "",
+      "properties": {
+        "nature": [
+          "绝对空间（牛顿）",
+          "相对空间（莱布尼茨）",
+          "关系论"
+        ],
+        "geometry": [
+          "欧几里得",
+          "非欧几何",
+          "流形"
+        ]
+      }
+    },
+    "phil_过程_process": {
+      "id": "phil_过程_process",
+      "name": "过程",
+      "type": "哲学概念",
+      "domain": "过程与变化",
+      "source": "philosophical-ontology",
+      "definition": "作为基本实在的事件序列",
+      "properties": {
+        "philosophers": [
+          "怀特海（过程哲学）",
+          "柏格森（绵延）"
+        ],
+        "priority": "过程优先 vs 实体优先"
+      }
+    },
+    "formal_BFO": {
+      "id": "formal_BFO",
+      "name": "BFO",
+      "type": "形式概念",
+      "domain": "upper_ontologies",
+      "source": "formal-ontology",
+      "definition": "基本形式本体论，生物医学领域最广泛使用的顶层本体",
+      "properties": {
+        "name": "Basic Formal Ontology",
+        "developer": "Barry Smith 等",
+        "domains": [
+          "生物医学",
+          "生命科学"
+        ],
+        "structure": {
+          "continuant": {
+            "definition": "在时间中持续存在、在某一时刻完全呈现的存在者",
+            "subtypes": [
+              "Independent Continuant（独立持续体）- 物质实体",
+              "Generically Dependent Continuant（类属依赖持续体）- 信息",
+              "Specifically Dependent Continuant（特定依赖持续体）- 性质、角色"
+            ]
+          },
+          "occurrent": {
+            "definition": "发生在时间中、具有时间部分的过程或事件",
+            "subtypes": [
+              "Process（过程）- 有界时间延展",
+              "Process Boundary（过程边界）- 瞬间",
+              "Temporal Region（时间区域）- 时间点或时段"
+            ]
+          }
+        }
+      }
+    },
+    "formal_DOLCE": {
+      "id": "formal_DOLCE",
+      "name": "DOLCE",
+      "type": "形式概念",
+      "domain": "upper_ontologies",
+      "source": "formal-ontology",
+      "definition": "为语言和认知工程设计的描述性本体论",
+      "properties": {
+        "name": "Descriptive Ontology for Linguistic and Cognitive Engineering",
+        "developer": "意大利CNR",
+        "characteristics": "认知导向、紧密连接语言",
+        "categories": [
+          "Physical Object（物理对象）",
+          "Physical Quality（物理性质）",
+          "Abstract Quality（抽象性质）",
+          "Perdurant（持续体/过程）",
+          "Stative（静态）",
+          "Event（事件）",
+          "Achievement（成就）",
+          "Accomplishment（完成）"
+        ]
+      }
+    },
+    "formal_SUMO": {
+      "id": "formal_SUMO",
+      "name": "SUMO",
+      "type": "形式概念",
+      "domain": "upper_ontologies",
+      "source": "formal-ontology",
+      "definition": "建议上层合并本体论，最大的公开顶层本体",
+      "properties": {
+        "name": "Suggested Upper Merged Ontology",
+        "developer": "IEEE标准",
+        "size": "约20,000个术语，70,000条公理",
+        "domains": [
+          "通用",
+          "跨领域"
+        ],
+        "structure": [
+          "Physical（物理）",
+          "Abstract（抽象）",
+          "SetOrClass（集合或类）",
+          "Relation（关系）",
+          "Quantity（量）",
+          "Process（过程）"
+        ]
+      }
+    },
+    "formal_Cyc": {
+      "id": "formal_Cyc",
+      "name": "Cyc",
+      "type": "形式概念",
+      "domain": "upper_ontologies",
+      "source": "formal-ontology",
+      "definition": "最庞大的常识知识本体",
+      "properties": {
+        "name": "Cyc Ontology",
+        "developer": "Cycorp公司",
+        "size": "数百万条概念和规则",
+        "focus": "常识推理、自然语言理解"
+      }
+    },
+    "formal_part_whole": {
+      "id": "formal_part_whole",
+      "name": "part_whole",
+      "type": "形式概念",
+      "domain": "basic_formal_relations",
+      "source": "formal-ontology",
+      "definition": "",
+      "properties": {
+        "name": "部分-整体关系",
+        "formal_name": "mereology",
+        "axioms": {
+          "reflexivity": "∀x: P(x, x) - 自反性",
+          "antisymmetry": "∀x,y: P(x,y) ∧ P(y,x) → x=y - 反对称性",
+          "transitivity": "∀x,y,z: P(x,y) ∧ P(y,z) → P(x,z) - 传递性"
+        },
+        "types": [
+          "proper_part（真部分）",
+          "overlapping（重叠）",
+          "sum（和）",
+          "product（积）",
+          "difference（差）"
+        ]
+      }
+    },
+    "formal_type_instance": {
+      "id": "formal_type_instance",
+      "name": "type_instance",
+      "type": "形式概念",
+      "domain": "basic_formal_relations",
+      "source": "formal-ontology",
+      "definition": "类与其实例之间的例示关系",
+      "properties": {
+        "name": "类型-实例关系",
+        "formal_notation": "InstanceOf(i, C)",
+        "characteristics": [
+          "非自反",
+          "非对称",
+          "非传递"
+        ],
+        "related": [
+          "rdf:type",
+          " instantiation"
+        ]
+      }
+    },
+    "formal_class_subclass": {
+      "id": "formal_class_subclass",
+      "name": "class_subclass",
+      "type": "形式概念",
+      "domain": "basic_formal_relations",
+      "source": "formal-ontology",
+      "definition": "概念层次中的包含关系",
+      "properties": {
+        "name": "类-子类关系",
+        "formal_notation": "SubClassOf(C, D)",
+        "axioms": {
+          "reflexivity": "每个类是自己的子类",
+          "antisymmetry": "双向包含意味着等同",
+          "transitivity": "子类的子类仍是子类"
+        }
+      }
+    },
+    "formal_attribution": {
+      "id": "formal_attribution",
+      "name": "attribution",
+      "type": "形式概念",
+      "domain": "basic_formal_relations",
+      "source": "formal-ontology",
+      "definition": "实体具有某种属性或值",
+      "properties": {
+        "name": "属性归属关系",
+        "types": [
+          "数据属性（Data Property）- 关联字面量",
+          "对象属性（Object Property）- 关联实体"
+        ]
+      }
+    },
+    "formal_identity": {
+      "id": "formal_identity",
+      "name": "identity",
+      "type": "形式概念",
+      "domain": "basic_formal_relations",
+      "source": "formal-ontology",
+      "definition": "",
+      "properties": {
+        "name": "同一性关系",
+        "criteria": [
+          "莱布尼茨律：不可分辨者的同一性",
+          "时空连续性",
+          "因果连续性",
+          "结构连续性"
+        ],
+        "problems": [
+          "跨时间同一性",
+          "跨可能世界同一性"
+        ]
+      }
+    },
+    "formal_data_properties": {
+      "id": "formal_data_properties",
+      "name": "data_properties",
+      "type": "形式概念",
+      "domain": "property_system",
+      "source": "formal-ontology",
+      "definition": "关联个体与数据值的属性",
+      "properties": {
+        "types": [
+          "字符串（xsd:string）",
+          "整数（xsd:integer）",
+          "小数（xsd:decimal）",
+          "布尔（xsd:boolean）",
+          "日期时间（xsd:dateTime）"
+        ],
+        "characteristics": [
+          "函数性",
+          "反函数性"
+        ]
+      }
+    },
+    "formal_object_properties": {
+      "id": "formal_object_properties",
+      "name": "object_properties",
+      "type": "形式概念",
+      "domain": "property_system",
+      "source": "formal-ontology",
+      "definition": "关联两个个体的属性",
+      "properties": {
+        "characteristics": {
+          "functional": "每个主体最多一个客体",
+          "inverseFunctional": "每个客体最多一个主体",
+          "transitive": "传递性",
+          "symmetric": "对称性",
+          "asymmetric": "反对称性",
+          "reflexive": "自反性",
+          "irreflexive": "反自反性"
+        }
+      }
+    },
+    "formal_annotation_properties": {
+      "id": "formal_annotation_properties",
+      "name": "annotation_properties",
+      "type": "形式概念",
+      "domain": "property_system",
+      "source": "formal-ontology",
+      "definition": "用于注释和元数据的属性",
+      "properties": {
+        "examples": [
+          "rdfs:label",
+          "rdfs:comment",
+          "dc:creator",
+          "versionInfo"
+        ]
+      }
+    },
+    "formal_modularity": {
+      "id": "formal_modularity",
+      "name": "modularity",
+      "type": "形式概念",
+      "domain": "ontology_methodology",
+      "source": "formal-ontology",
+      "definition": "",
+      "properties": {
+        "approaches": [
+          "导入机制",
+          "模块分割",
+          "视图提取"
+        ],
+        "benefits": [
+          "可重用性",
+          "可维护性",
+          "并行开发"
+        ]
+      }
+    },
+    "formal_description_logic": {
+      "id": "formal_description_logic",
+      "name": "description_logic",
+      "type": "形式概念",
+      "domain": "logical_foundations",
+      "source": "formal-ontology",
+      "definition": "知识表示的形式化逻辑家族",
+      "properties": {
+        "name": "描述逻辑",
+        "complexity": "ALC到SROIQ的复杂度谱系",
+        "applications": [
+          "OWL本体",
+          "知识图谱",
+          "语义网"
+        ],
+        "constructors": [
+          "交",
+          "并",
+          "补",
+          "存在限制",
+          "全称限制",
+          "数量限制"
+        ]
+      }
+    },
+    "formal_first_order_logic": {
+      "id": "formal_first_order_logic",
+      "name": "first_order_logic",
+      "type": "形式概念",
+      "domain": "logical_foundations",
+      "source": "formal-ontology",
+      "definition": "本体论的形式化基础",
+      "properties": {
+        "name": "一阶逻辑",
+        "expressiveness": "高，但不可判定",
+        "tradeoff": "表达力 vs 计算复杂度"
+      }
+    },
+    "formal_modal_logic": {
+      "id": "formal_modal_logic",
+      "name": "modal_logic",
+      "type": "形式概念",
+      "domain": "logical_foundations",
+      "source": "formal-ontology",
+      "definition": "处理必然性和可能性的逻辑",
+      "properties": {
+        "name": "模态逻辑",
+        "types": [
+          "命题模态逻辑",
+          "一阶模态逻辑",
+          "时态逻辑"
+        ],
+        "ontology": "可能世界语义学"
+      }
+    },
+    "formal_RDF": {
+      "id": "formal_RDF",
+      "name": "RDF",
+      "type": "形式概念",
+      "domain": "ontology_languages",
+      "source": "formal-ontology",
+      "definition": "资源描述框架，三元组模型",
+      "properties": {
+        "name": "Resource Description Framework",
+        "structure": "主语-谓语-宾语（S-P-O）",
+        "serialization": [
+          "Turtle",
+          "JSON-LD",
+          "XML"
+        ]
+      }
+    },
+    "formal_RDFS": {
+      "id": "formal_RDFS",
+      "name": "RDFS",
+      "type": "形式概念",
+      "domain": "ontology_languages",
+      "source": "formal-ontology",
+      "definition": "RDF的词汇描述语言",
+      "properties": {
+        "name": "RDF Schema",
+        "features": [
+          "类定义",
+          "属性定义",
+          "层次关系"
+        ]
+      }
+    },
+    "formal_OWL": {
+      "id": "formal_OWL",
+      "name": "OWL",
+      "type": "形式概念",
+      "domain": "ontology_languages",
+      "source": "formal-ontology",
+      "definition": "万维网本体语言",
+      "properties": {
+        "name": "Web Ontology Language",
+        "species": [
+          "OWL Lite",
+          "OWL DL",
+          "OWL Full"
+        ],
+        "version": [
+          "OWL 1",
+          "OWL 2（增加属性链、键、数据范围等）"
+        ],
+        "expressiveness": "描述逻辑家族"
+      }
+    },
+    "formal_SKOS": {
+      "id": "formal_SKOS",
+      "name": "SKOS",
+      "type": "形式概念",
+      "domain": "ontology_languages",
+      "source": "formal-ontology",
+      "definition": "简单知识组织系统",
+      "properties": {
+        "name": "Simple Knowledge Organization System",
+        "use_case": "词表、分类法、叙词表",
+        "relations": [
+          "broader",
+          "narrower",
+          "related",
+          "exactMatch"
+        ]
+      }
+    },
+    "sci_物质_matter": {
+      "id": "sci_物质_matter",
+      "name": "物质",
+      "type": "科学概念",
+      "domain": "物理层",
+      "level": 1,
+      "source": "scientific-ontology",
+      "definition": "具有质量和占据空间的实体",
+      "properties": {
+        "forms": [
+          "固体",
+          "液体",
+          "气体",
+          "等离子体"
+        ],
+        "constituents": [
+          "基本粒子",
+          "原子",
+          "分子"
+        ],
+        "properties": [
+          "质量",
+          "体积",
+          "密度",
+          "惯性"
+        ]
+      }
+    },
+    "sci_能量_energy": {
+      "id": "sci_能量_energy",
+      "name": "能量",
+      "type": "科学概念",
+      "domain": "物理层",
+      "level": 1,
+      "source": "scientific-ontology",
+      "definition": "做功的能力",
+      "properties": {
+        "forms": [
+          "动能",
+          "势能",
+          "热能",
+          "电磁能",
+          "核能"
+        ],
+        "conservation": "能量守恒定律",
+        "transformation": "能量转换原理"
+      }
+    },
+    "sci_力_force": {
+      "id": "sci_力_force",
+      "name": "力",
+      "type": "科学概念",
+      "domain": "物理层",
+      "level": 1,
+      "source": "scientific-ontology",
+      "definition": "改变物体运动状态的作用",
+      "properties": {
+        "types": [
+          "引力（重力）",
+          "电磁力",
+          "强核力",
+          "弱核力"
+        ],
+        "unification": "大统一理论追求"
+      }
+    },
+    "sci_场_field": {
+      "id": "sci_场_field",
+      "name": "场",
+      "type": "科学概念",
+      "domain": "物理层",
+      "level": 1,
+      "source": "scientific-ontology",
+      "definition": "充满空间的物理量分布",
+      "properties": {
+        "types": [
+          "引力场",
+          "电磁场",
+          "量子场",
+          "希格斯场"
+        ],
+        "ontology": "场是基本实在还是数学工具？"
+      }
+    },
+    "sci_时空_spacetime": {
+      "id": "sci_时空_spacetime",
+      "name": "时空",
+      "type": "科学概念",
+      "domain": "物理层",
+      "level": 1,
+      "source": "scientific-ontology",
+      "definition": "时间和空间的统一结构",
+      "properties": {
+        "classical": "牛顿绝对时空",
+        "relativistic": "爱因斯坦相对时空",
+        "quantum": "量子引力理论探索"
+      }
+    },
+    "sci_元素_element": {
+      "id": "sci_元素_element",
+      "name": "元素",
+      "type": "科学概念",
+      "domain": "化学层",
+      "level": 2,
+      "source": "scientific-ontology",
+      "definition": "由相同质子数原子组成的纯物质",
+      "properties": {
+        "organization": "元素周期表",
+        "properties": [
+          "原子序数",
+          "原子量",
+          "电负性",
+          "电子构型"
+        ]
+      }
+    },
+    "sci_原子_atom": {
+      "id": "sci_原子_atom",
+      "name": "原子",
+      "type": "科学概念",
+      "domain": "化学层",
+      "level": 2,
+      "source": "scientific-ontology",
+      "definition": "化学变化中的最小粒子",
+      "properties": {
+        "structure": [
+          "质子",
+          "中子",
+          "电子"
+        ],
+        "models": [
+          "道尔顿模型",
+          "卢瑟福模型",
+          "玻尔模型",
+          "量子模型"
+        ]
+      }
+    },
+    "sci_分子_molecule": {
+      "id": "sci_分子_molecule",
+      "name": "分子",
+      "type": "科学概念",
+      "domain": "化学层",
+      "level": 2,
+      "source": "scientific-ontology",
+      "definition": "两个或以上原子通过化学键结合",
+      "properties": {
+        "types": [
+          "单质分子",
+          "化合物分子"
+        ],
+        "properties": [
+          "分子量",
+          "分子式",
+          "结构式"
+        ]
+      }
+    },
+    "sci_化合物_compound": {
+      "id": "sci_化合物_compound",
+      "name": "化合物",
+      "type": "科学概念",
+      "domain": "化学层",
+      "level": 2,
+      "source": "scientific-ontology",
+      "definition": "不同元素按固定比例化合形成的物质",
+      "properties": {
+        "types": [
+          "离子化合物",
+          "共价化合物",
+          "配位化合物"
+        ],
+        "nomenclature": "IUPAC命名法"
+      }
+    },
+    "sci_化学键_chemical_bond": {
+      "id": "sci_化学键_chemical_bond",
+      "name": "化学键",
+      "type": "科学概念",
+      "domain": "化学层",
+      "level": 2,
+      "source": "scientific-ontology",
+      "definition": "原子间的强相互作用",
+      "properties": {
+        "types": [
+          "离子键 - 电子转移",
+          "共价键 - 电子共享",
+          "金属键 - 电子海",
+          "氢键 - 特殊偶极作用"
+        ]
+      }
+    },
+    "sci_化学反应_reaction": {
+      "id": "sci_化学反应_reaction",
+      "name": "化学反应",
+      "type": "科学概念",
+      "domain": "化学层",
+      "level": 2,
+      "source": "scientific-ontology",
+      "definition": "物质转化过程",
+      "properties": {
+        "types": [
+          "合成",
+          "分解",
+          "置换",
+          "复分解",
+          "氧化还原"
+        ],
+        "dynamics": [
+          "反应速率",
+          "化学平衡",
+          "催化"
+        ]
+      }
+    },
+    "sci_生命_life": {
+      "id": "sci_生命_life",
+      "name": "生命",
+      "type": "科学概念",
+      "domain": "生物层",
+      "level": 3,
+      "source": "scientific-ontology",
+      "definition": "具有新陈代谢、生长、繁殖、应激性的系统",
+      "properties": {
+        "criteria": [
+          "细胞结构",
+          "新陈代谢",
+          "稳态",
+          "生长",
+          "繁殖",
+          "适应",
+          "响应刺激"
+        ],
+        "origin": "生命起源理论（化学进化、RNA世界等）"
+      }
+    },
+    "sci_细胞_cell": {
+      "id": "sci_细胞_cell",
+      "name": "细胞",
+      "type": "科学概念",
+      "domain": "生物层",
+      "level": 3,
+      "source": "scientific-ontology",
+      "definition": "生命的基本结构和功能单位",
+      "properties": {
+        "types": [
+          "原核细胞",
+          "真核细胞"
+        ],
+        "components": [
+          "细胞膜",
+          "细胞质",
+          "细胞核",
+          "细胞器"
+        ],
+        "processes": [
+          "分裂",
+          "分化",
+          "信号传导",
+          "代谢"
+        ]
+      }
+    },
+    "sci_基因_gene": {
+      "id": "sci_基因_gene",
+      "name": "基因",
+      "type": "科学概念",
+      "domain": "生物层",
+      "level": 3,
+      "source": "scientific-ontology",
+      "definition": "遗传信息的功能单位",
+      "properties": {
+        "material": "DNA/RNA序列",
+        "functions": [
+          "编码蛋白质",
+          "调控表达",
+          "遗传"
+        ],
+        "ontology": "基因是实体还是抽象信息？"
+      }
+    },
+    "sci_进化_evolution": {
+      "id": "sci_进化_evolution",
+      "name": "进化",
+      "type": "科学概念",
+      "domain": "生物层",
+      "level": 3,
+      "source": "scientific-ontology",
+      "definition": "种群遗传特征随时间的变化",
+      "properties": {
+        "mechanisms": [
+          "自然选择",
+          "遗传漂变",
+          "基因流",
+          "突变"
+        ],
+        "patterns": [
+          "适应辐射",
+          "趋同进化",
+          "协同进化"
+        ]
+      }
+    },
+    "sci_生态系统_ecosystem": {
+      "id": "sci_生态系统_ecosystem",
+      "name": "生态系统",
+      "type": "科学概念",
+      "domain": "生物层",
+      "level": 3,
+      "source": "scientific-ontology",
+      "definition": "生物群落与其环境的相互作用系统",
+      "properties": {
+        "components": [
+          "生产者",
+          "消费者",
+          "分解者",
+          "非生物环境"
+        ],
+        "processes": [
+          "能量流动",
+          "物质循环",
+          "信息传递"
+        ],
+        "properties": [
+          "生物多样性",
+          "稳定性",
+          "恢复力"
+        ]
+      }
+    },
+    "sci_生物组织层次": {
+      "id": "sci_生物组织层次",
+      "name": "生物组织层次",
+      "type": "科学概念",
+      "domain": "生物层",
+      "level": 3,
+      "source": "scientific-ontology",
+      "definition": "",
+      "properties": {
+        "hierarchy": [
+          "原子 → 分子 → 细胞器 → 细胞 → 组织 → 器官 → 系统 → 个体 → 种群 → 群落 → 生态系统 → 生物圈"
+        ]
+      }
+    },
+    "sci_意识_consciousness": {
+      "id": "sci_意识_consciousness",
+      "name": "意识",
+      "type": "科学概念",
+      "domain": "认知层",
+      "level": 4,
+      "source": "scientific-ontology",
+      "definition": "主观体验或感质（qualia）",
+      "properties": {
+        "problems": [
+          "困难问题（解释鸿沟）",
+          "组合问题",
+          "测量问题"
+        ],
+        "theories": [
+          "全局工作空间理论",
+          "整合信息理论",
+          "高阶理论",
+          "泛心论"
+        ]
+      }
+    },
+    "sci_思维_thought": {
+      "id": "sci_思维_thought",
+      "name": "思维",
+      "type": "科学概念",
+      "domain": "认知层",
+      "level": 4,
+      "source": "scientific-ontology",
+      "definition": "认知过程，包括推理、判断、概念形成",
+      "properties": {
+        "types": [
+          "形象思维",
+          "抽象思维",
+          "逻辑思维",
+          "直觉思维"
+        ],
+        "processes": [
+          "概念化",
+          "分类",
+          "推理",
+          "问题解决"
+        ]
+      }
+    },
+    "sci_记忆_memory": {
+      "id": "sci_记忆_memory",
+      "name": "记忆",
+      "type": "科学概念",
+      "domain": "认知层",
+      "level": 4,
+      "source": "scientific-ontology",
+      "definition": "信息的编码、存储和提取",
+      "properties": {
+        "types": [
+          "感觉记忆",
+          "短时记忆/工作记忆",
+          "长时记忆（陈述性/程序性）"
+        ],
+        "neural_basis": "突触可塑性、海马体、皮层网络"
+      }
+    },
+    "sci_感知_perception": {
+      "id": "sci_感知_perception",
+      "name": "感知",
+      "type": "科学概念",
+      "domain": "认知层",
+      "level": 4,
+      "source": "scientific-ontology",
+      "definition": "通过感官获取环境信息的过程",
+      "properties": {
+        "modalities": [
+          "视觉",
+          "听觉",
+          "触觉",
+          "味觉",
+          "嗅觉",
+          "本体感觉"
+        ],
+        "processes": [
+          "感觉",
+          "组织",
+          "解释",
+          "识别"
+        ]
+      }
+    },
+    "sci_情感_emotion": {
+      "id": "sci_情感_emotion",
+      "name": "情感",
+      "type": "科学概念",
+      "domain": "认知层",
+      "level": 4,
+      "source": "scientific-ontology",
+      "definition": "复杂的心理生理状态",
+      "properties": {
+        "components": [
+          "主观体验",
+          "生理反应",
+          "表情",
+          "行为倾向"
+        ],
+        "theories": [
+          "詹姆斯-兰格",
+          "坎农-巴德",
+          "沙赫特-辛格",
+          "拉扎勒斯"
+        ]
+      }
+    },
+    "sci_认知架构": {
+      "id": "sci_认知架构",
+      "name": "认知架构",
+      "type": "科学概念",
+      "domain": "认知层",
+      "level": 4,
+      "source": "scientific-ontology",
+      "definition": "",
+      "properties": {
+        "description": "认知系统的组织结构",
+        "examples": [
+          "ACT-R",
+          "SOAR",
+          "CLARION"
+        ],
+        "components": [
+          "记忆模块",
+          "控制模块",
+          "学习机制",
+          "感知运动接口"
+        ]
+      }
+    },
+    "sci_个体_individual": {
+      "id": "sci_个体_individual",
+      "name": "个体",
+      "type": "科学概念",
+      "domain": "社会层",
+      "level": 5,
+      "source": "scientific-ontology",
+      "definition": "社会系统中的基本行动者",
+      "properties": {
+        "properties": [
+          "身份",
+          "角色",
+          "地位",
+          "权力",
+          "资源"
+        ],
+        "agency": "行动能力和意图性"
+      }
+    },
+    "sci_群体_group": {
+      "id": "sci_群体_group",
+      "name": "群体",
+      "type": "科学概念",
+      "domain": "社会层",
+      "level": 5,
+      "source": "scientific-ontology",
+      "definition": "两个或以上个体的集合",
+      "properties": {
+        "types": [
+          "初级群体",
+          "次级群体",
+          "内群体",
+          "外群体",
+          "参照群体"
+        ],
+        "dynamics": [
+          "凝聚力",
+          "规范",
+          "角色分化",
+          "沟通网络"
+        ]
+      }
+    },
+    "sci_组织_organization": {
+      "id": "sci_组织_organization",
+      "name": "组织",
+      "type": "科学概念",
+      "domain": "社会层",
+      "level": 5,
+      "source": "scientific-ontology",
+      "definition": "为实现特定目标而建立的正式社会结构",
+      "properties": {
+        "elements": [
+          "目标",
+          "结构",
+          "技术",
+          "人员",
+          "环境"
+        ],
+        "types": [
+          "官僚制",
+          "网络组织",
+          "学习型组织"
+        ]
+      }
+    },
+    "sci_制度_institution": {
+      "id": "sci_制度_institution",
+      "name": "制度",
+      "type": "科学概念",
+      "domain": "社会层",
+      "level": 5,
+      "source": "scientific-ontology",
+      "definition": "规范社会行为的稳定规则和实践",
+      "properties": {
+        "types": [
+          "正式制度（法律）",
+          "非正式制度（习俗）"
+        ],
+        "functions": [
+          "降低不确定性",
+          "协调行动",
+          "分配资源"
+        ]
+      }
+    },
+    "sci_文化_culture": {
+      "id": "sci_文化_culture",
+      "name": "文化",
+      "type": "科学概念",
+      "domain": "社会层",
+      "level": 5,
+      "source": "scientific-ontology",
+      "definition": "群体共享的符号、价值观、实践和人工制品",
+      "properties": {
+        "components": [
+          "物质文化",
+          "认知文化",
+          "规范文化"
+        ],
+        "transmission": "社会化、教育、媒体"
+      }
+    },
+    "sci_社会关系": {
+      "id": "sci_社会关系",
+      "name": "社会关系",
+      "type": "科学概念",
+      "domain": "社会层",
+      "level": 5,
+      "source": "scientific-ontology",
+      "definition": "",
+      "properties": {
+        "types": [
+          "经济关系（交换、生产、分配）",
+          "政治关系（权力、权威、治理）",
+          "亲属关系（血缘、婚姻）",
+          "互动关系（合作、竞争、冲突）"
+        ]
+      }
+    },
+    "sci_数据_data": {
+      "id": "sci_数据_data",
+      "name": "数据",
+      "type": "科学概念",
+      "domain": "信息层",
+      "level": 6,
+      "source": "scientific-ontology",
+      "definition": "未经解释的原始符号",
+      "properties": {
+        "properties": [
+          "离散性",
+          "可测量性",
+          "可存储性"
+        ],
+        "types": [
+          "定量数据",
+          "定性数据",
+          "结构化",
+          "非结构化"
+        ]
+      }
+    },
+    "sci_信息_information": {
+      "id": "sci_信息_information",
+      "name": "信息",
+      "type": "科学概念",
+      "domain": "信息层",
+      "level": 6,
+      "source": "scientific-ontology",
+      "definition": "有意义的数据，减少不确定性",
+      "properties": {
+        "theories": [
+          "香农信息论",
+          "语义信息",
+          " pragmatic信息"
+        ],
+        "measures": [
+          "熵",
+          "互信息",
+          "信道容量"
+        ]
+      }
+    },
+    "sci_知识_knowledge": {
+      "id": "sci_知识_knowledge",
+      "name": "知识",
+      "type": "科学概念",
+      "domain": "信息层",
+      "level": 6,
+      "source": "scientific-ontology",
+      "definition": "被证实为真的信念（传统定义）",
+      "properties": {
+        "types": [
+          "陈述性知识（知道什么）",
+          "程序性知识（知道如何）",
+          "条件性知识（知道何时何地）"
+        ],
+        "sources": [
+          "感知",
+          "推理",
+          "证词",
+          "记忆"
+        ]
+      }
+    },
+    "sci_意义_meaning": {
+      "id": "sci_意义_meaning",
+      "name": "意义",
+      "type": "科学概念",
+      "domain": "信息层",
+      "level": 6,
+      "source": "scientific-ontology",
+      "definition": "符号与所指之间的关系",
+      "properties": {
+        "theories": [
+          "指称论 - 符号与对象的关系",
+          "观念论 - 符号与心理表征",
+          "使用论 - 语言游戏和用法",
+          "真值条件论 - 命题的真值条件"
+        ]
+      }
+    },
+    "sci_符号_symbol": {
+      "id": "sci_符号_symbol",
+      "name": "符号",
+      "type": "科学概念",
+      "domain": "信息层",
+      "level": 6,
+      "source": "scientific-ontology",
+      "definition": "代表或指向其他事物的标记",
+      "properties": {
+        "types": [
+          "图像符号",
+          "指示符号",
+          "象征符号（皮尔士）"
+        ],
+        "systems": [
+          "自然语言",
+          "形式语言",
+          "编程语言",
+          "数学符号"
+        ]
+      }
+    },
+    "sci_表征_representation": {
+      "id": "sci_表征_representation",
+      "name": "表征",
+      "type": "科学概念",
+      "domain": "信息层",
+      "level": 6,
+      "source": "scientific-ontology",
+      "definition": "用某种形式替代或代表某物",
+      "properties": {
+        "types": [
+          "心理表征",
+          "语言表征",
+          "图像表征",
+          "数学表征"
+        ],
+        "problems": [
+          "表征问题",
+          "关于性（意向性）问题"
+        ]
+      }
+    }
+  },
+  "relation_index": {},
+  "domain_mappings": {
+    "哲学-形式映射": {
+      "description": "哲学概念到形式本体的映射",
+      "mappings": [
+        {
+          "philosophy": "实体",
+          "formal": "类（Class）"
+        },
+        {
+          "philosophy": "属性",
+          "formal": "属性（Property）"
+        },
+        {
+          "philosophy": "关系",
+          "formal": "对象属性"
+        },
+        {
+          "philosophy": "范畴",
+          "formal": "层次结构"
+        }
+      ]
+    },
+    "科学-哲学映射": {
+      "description": "科学概念到哲学基础的映射",
+      "mappings": [
+        {
+          "science": "物质",
+          "philosophy": "实体"
+        },
+        {
+          "science": "能量",
+          "philosophy": "过程"
+        },
+        {
+          "science": "生命",
+          "philosophy": "涌现"
+        },
+        {
+          "science": "意识",
+          "philosophy": "属性"
+        },
+        {
+          "science": "信息",
+          "philosophy": "关系"
+        }
+      ]
+    },
+    "层次-形式映射": {
+      "description": "科学层次到形式结构的映射",
+      "mappings": [
+        {
+          "level": "物理层",
+          "formal": "基础类"
+        },
+        {
+          "level": "化学层",
+          "formal": "组合类"
+        },
+        {
+          "level": "生物层",
+          "formal": "系统类"
+        },
+        {
+          "level": "认知层",
+          "formal": "涌现类"
+        },
+        {
+          "level": "社会层",
+          "formal": "集体类"
+        },
+        {
+          "level": "信息层",
+          "formal": "抽象类"
+        }
+      ]
+    }
+  },
+  "cross_references": [
+    {
+      "source": "phil_实体_substance",
+      "target": "sci_物质_matter",
+      "relation": "对应",
+      "description": "哲学实体概念对应科学物质概念"
+    },
+    {
+      "source": "phil_属性_properties",
+      "target": "formal_数据属性_data_properties",
+      "relation": "形式化",
+      "description": "属性概念在形式本体中实现为数据属性"
+    },
+    {
+      "source": "phil_关系_relations",
+      "target": "formal_对象属性_object_properties",
+      "relation": "形式化",
+      "description": "关系概念在形式本体中实现为对象属性"
+    },
+    {
+      "source": "sci_能量_energy",
+      "target": "phil_过程与变化",
+      "relation": "哲学基础",
+      "description": "能量概念涉及变化过程的本体论"
+    },
+    {
+      "source": "sci_生命_life",
+      "target": "phil_实体_substance",
+      "relation": "实例",
+      "description": "生命是实体的一种特殊形式"
+    },
+    {
+      "source": "sci_意识_consciousness",
+      "target": "phil_属性_properties",
+      "relation": "涌现属性",
+      "description": "意识作为高层次涌现属性"
+    },
+    {
+      "source": "formal_BFO",
+      "target": "sci_物理层",
+      "relation": "应用",
+      "description": "BFO顶层本体应用于科学领域"
+    },
+    {
+      "source": "formal_DOLCE",
+      "target": "phil_范畴论",
+      "relation": "继承",
+      "description": "DOLCE继承哲学范畴论传统"
+    }
+  ]
+}

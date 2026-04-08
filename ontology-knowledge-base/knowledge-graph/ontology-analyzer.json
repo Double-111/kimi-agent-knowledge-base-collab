@@ -1,0 +1,673 @@
+{
+  "metadata": {
+    "title": "本体分析引擎",
+    "description": "分析任意事物的本体论构成",
+    "version": "1.0"
+  },
+  "analysis_dimensions": {
+    "实体层次": {
+      "description": "事物在本体层次中的位置",
+      "levels": [
+        {
+          "level": 1,
+          "name": "物理层",
+          "concepts": [
+            "物质",
+            "材料",
+            "结构",
+            "形状"
+          ],
+          "examples": [
+            "金属",
+            "橡胶",
+            "分子",
+            "原子"
+          ]
+        },
+        {
+          "level": 2,
+          "name": "化学层",
+          "concepts": [
+            "化合物",
+            "材料属性",
+            "化学反应"
+          ],
+          "examples": [
+            "合金",
+            "聚合物",
+            "涂层"
+          ]
+        },
+        {
+          "level": 3,
+          "name": "生物层",
+          "concepts": [
+            "生命",
+            "有机体",
+            "生态系统"
+          ],
+          "examples": [
+            "人类",
+            "动物",
+            "植物"
+          ]
+        },
+        {
+          "level": 4,
+          "name": "人工层",
+          "concepts": [
+            "人工制品",
+            "工具",
+            "机器",
+            "设计"
+          ],
+          "examples": [
+            "工具",
+            "建筑",
+            "车辆",
+            "电子设备"
+          ]
+        },
+        {
+          "level": 5,
+          "name": "认知层",
+          "concepts": [
+            "概念",
+            "意图",
+            "功能",
+            "意义"
+          ],
+          "examples": [
+            "想法",
+            "计划",
+            "知识"
+          ]
+        },
+        {
+          "level": 6,
+          "name": "社会层",
+          "concepts": [
+            "制度",
+            "文化",
+            "经济",
+            "法律"
+          ],
+          "examples": [
+            "公司",
+            "货币",
+            "法律",
+            "习俗"
+          ]
+        },
+        {
+          "level": 7,
+          "name": "信息层",
+          "concepts": [
+            "数据",
+            "信息",
+            "符号",
+            "表示"
+          ],
+          "examples": [
+            "文字",
+            "图像",
+            "代码"
+          ]
+        }
+      ]
+    },
+    "本体属性": {
+      "description": "事物的基本属性类别",
+      "categories": {
+        "本质属性": {
+          "description": "定义事物之为该事物的属性",
+          "examples": [
+            "功能",
+            "结构",
+            "目的"
+          ]
+        },
+        "偶然属性": {
+          "description": "事物可以变化而不改变其本质的属性",
+          "examples": [
+            "颜色",
+            "大小",
+            "位置",
+            "状态"
+          ]
+        },
+        "关系属性": {
+          "description": "事物相对于其他事物的属性",
+          "examples": [
+            "部分-整体",
+            "因果",
+            "空间",
+            "时间"
+          ]
+        },
+        "功能属性": {
+          "description": "事物的用途和能力",
+          "examples": [
+            "运输",
+            "存储",
+            "通信",
+            "计算"
+          ]
+        }
+      }
+    },
+    "构成关系": {
+      "description": "事物的组成部分关系",
+      "relation_types": [
+        {
+          "name": "部分-整体",
+          "description": "mereological关系",
+          "examples": [
+            "轮子-自行车",
+            "引擎-汽车"
+          ]
+        },
+        {
+          "name": "材料-对象",
+          "description": "构成材料关系",
+          "examples": [
+            "金属-车架",
+            "橡胶-轮胎"
+          ]
+        },
+        {
+          "name": "功能-载体",
+          "description": "功能实现关系",
+          "examples": [
+            "运输-车辆",
+            "切割-刀具"
+          ]
+        },
+        {
+          "name": "类型-实例",
+          "description": "分类关系",
+          "examples": [
+            "自行车-我的自行车",
+            "汽车-特斯拉"
+          ]
+        }
+      ]
+    },
+    "存在模态": {
+      "description": "事物的存在方式",
+      "modalities": [
+        {
+          "name": "物理存在",
+          "description": "占据时空的物质实体"
+        },
+        {
+          "name": "功能存在",
+          "description": "通过功能定义的存在"
+        },
+        {
+          "name": "社会存在",
+          "description": "依赖社会制度的存在"
+        },
+        {
+          "name": "信息存在",
+          "description": "作为符号或数据的存在"
+        }
+      ]
+    }
+  },
+  "example_analyses": {
+    "自行车": {
+      "entity_name": "自行车",
+      "primary_level": "人工层",
+      "secondary_levels": [
+        "物理层",
+        "社会层"
+      ],
+      "ontology_breakdown": {
+        "实体层次": {
+          "主要层次": "人工层（工具/机器）",
+          "物理基础": "物质实体（金属、橡胶等材料）",
+          "社会维度": "交通工具、运动器材、文化符号"
+        },
+        "本质属性": [
+          {
+            "attribute": "双轮结构",
+            "description": "两个轮子的基本配置",
+            "necessity": "必要"
+          },
+          {
+            "attribute": "人力驱动",
+            "description": "通过脚踏板驱动",
+            "necessity": "典型但非必要（电动自行车除外）"
+          },
+          {
+            "attribute": "转向机制",
+            "description": "通过车把控制方向",
+            "necessity": "必要"
+          },
+          {
+            "attribute": "运输功能",
+            "description": "运送人员或物品",
+            "necessity": "核心功能"
+          }
+        ],
+        "偶然属性": [
+          {
+            "attribute": "颜色",
+            "examples": [
+              "红色",
+              "蓝色",
+              "黑色"
+            ]
+          },
+          {
+            "attribute": "尺寸",
+            "examples": [
+              "20寸",
+              "26寸",
+              "29寸"
+            ]
+          },
+          {
+            "attribute": "材质",
+            "examples": [
+              "钢",
+              "铝",
+              "碳纤维"
+            ]
+          },
+          {
+            "attribute": "品牌",
+            "examples": [
+              "捷安特",
+              "美利达",
+              "永久"
+            ]
+          },
+          {
+            "attribute": "变速档位",
+            "examples": [
+              "单速",
+              "21速",
+              "30速"
+            ]
+          }
+        ],
+        "构成部分": [
+          {
+            "part": "车架",
+            "function": "主体支撑结构",
+            "material": "金属/碳纤维",
+            "ontology_relation": "整体-部分"
+          },
+          {
+            "part": "车轮",
+            "function": "滚动移动",
+            "material": "橡胶轮胎+金属轮圈",
+            "ontology_relation": "整体-部分"
+          },
+          {
+            "part": "传动系统",
+            "function": "传递动力",
+            "components": [
+              "链条",
+              "齿轮",
+              "脚踏板"
+            ],
+            "ontology_relation": "整体-部分"
+          },
+          {
+            "part": "转向系统",
+            "function": "控制方向",
+            "components": [
+              "车把",
+              "前叉"
+            ],
+            "ontology_relation": "整体-部分"
+          },
+          {
+            "part": "制动系统",
+            "function": "减速停止",
+            "components": [
+              "刹车片",
+              "刹车线"
+            ],
+            "ontology_relation": "整体-部分"
+          }
+        ],
+        "关系网络": [
+          {
+            "relation": "功能实现",
+            "target": "运输",
+            "description": "自行车实现运输功能"
+          },
+          {
+            "relation": "社会角色",
+            "target": "交通工具",
+            "description": "作为交通系统的一部分"
+          },
+          {
+            "relation": "文化意义",
+            "target": "环保/健康",
+            "description": "象征环保生活方式"
+          },
+          {
+            "relation": "经济价值",
+            "target": "商品",
+            "description": "可买卖的商品"
+          },
+          {
+            "relation": "使用关系",
+            "target": "骑行者",
+            "description": "人与自行车的互动"
+          }
+        ],
+        "本体论问题": [
+          {
+            "question": "自行车的本质是什么？",
+            "discussion": "是其物理结构还是其功能？如果去除轮子还是自行车吗？"
+          },
+          {
+            "question": "自行车的同一性如何确定？",
+            "discussion": "更换所有零件后还是同一辆自行车吗？（忒修斯之船问题）"
+          },
+          {
+            "question": "自行车作为人工制品的本体地位",
+            "discussion": "其存在依赖于设计意图还是物理实例？"
+          }
+        ],
+        "形式化表示": {
+          "RDF": "<自行车> rdf:type <人工制品>, <交通工具> .",
+          "OWL": "Class: 自行车 SubClassOf: 具有双轮结构 and 具有运输功能",
+          "描述逻辑": "自行车 ≡ 人工制品 ⊓ ∃hasPart.轮子 ⊓ ∃hasFunction.运输"
+        }
+      }
+    },
+    "手机": {
+      "entity_name": "手机",
+      "primary_level": "人工层",
+      "secondary_levels": [
+        "物理层",
+        "信息层",
+        "社会层"
+      ],
+      "ontology_breakdown": {
+        "实体层次": {
+          "主要层次": "人工层（电子设备）",
+          "物理基础": "电子元件、电池、屏幕",
+          "信息维度": "计算设备、通信终端",
+          "社会维度": "社交工具、身份象征"
+        },
+        "本质属性": [
+          {
+            "attribute": "移动通信",
+            "description": "无线通信能力",
+            "necessity": "必要"
+          },
+          {
+            "attribute": "计算处理",
+            "description": "运行应用程序",
+            "necessity": "必要"
+          },
+          {
+            "attribute": "便携性",
+            "description": "可随身携带",
+            "necessity": "必要"
+          }
+        ],
+        "偶然属性": [
+          {
+            "attribute": "屏幕尺寸",
+            "examples": [
+              "5寸",
+              "6寸",
+              "折叠屏"
+            ]
+          },
+          {
+            "attribute": "操作系统",
+            "examples": [
+              "iOS",
+              "Android",
+              "鸿蒙"
+            ]
+          },
+          {
+            "attribute": "颜色",
+            "examples": [
+              "黑色",
+              "白色",
+              "金色"
+            ]
+          },
+          {
+            "attribute": "存储容量",
+            "examples": [
+              "64GB",
+              "256GB",
+              "512GB"
+            ]
+          }
+        ],
+        "构成部分": [
+          {
+            "part": "处理器",
+            "function": "计算核心",
+            "ontology_relation": "整体-部分"
+          },
+          {
+            "part": "屏幕",
+            "function": "显示输出",
+            "ontology_relation": "整体-部分"
+          },
+          {
+            "part": "电池",
+            "function": "能源供应",
+            "ontology_relation": "整体-部分"
+          },
+          {
+            "part": "摄像头",
+            "function": "图像采集",
+            "ontology_relation": "整体-部分"
+          },
+          {
+            "part": "通信模块",
+            "function": "网络连接",
+            "ontology_relation": "整体-部分"
+          }
+        ],
+        "关系网络": [
+          {
+            "relation": "功能实现",
+            "target": "通信",
+            "description": "实现远程通信"
+          },
+          {
+            "relation": "信息处理",
+            "target": "计算",
+            "description": "信息处理设备"
+          },
+          {
+            "relation": "社会连接",
+            "target": "社交网络",
+            "description": "连接人与人"
+          },
+          {
+            "relation": "经济角色",
+            "target": "消费品",
+            "description": "电子消费品"
+          }
+        ]
+      }
+    },
+    "公司": {
+      "entity_name": "公司",
+      "primary_level": "社会层",
+      "secondary_levels": [
+        "信息层",
+        "法律层"
+      ],
+      "ontology_breakdown": {
+        "实体层次": {
+          "主要层次": "社会层（制度实体）",
+          "本体类型": "集体意向性实体",
+          "依赖关系": "依赖法律体系和人类认知"
+        },
+        "本质属性": [
+          {
+            "attribute": "法律人格",
+            "description": "具有法律主体地位",
+            "necessity": "必要"
+          },
+          {
+            "attribute": "组织目标",
+            "description": "追求特定经济或社会目标",
+            "necessity": "必要"
+          },
+          {
+            "attribute": "成员结构",
+            "description": "由员工、股东等组成",
+            "necessity": "必要"
+          }
+        ],
+        "偶然属性": [
+          {
+            "attribute": "规模",
+            "examples": [
+              "初创",
+              "中小企业",
+              "跨国集团"
+            ]
+          },
+          {
+            "attribute": "行业",
+            "examples": [
+              "科技",
+              "金融",
+              "制造",
+              "服务"
+            ]
+          },
+          {
+            "attribute": "所有制",
+            "examples": [
+              "私营",
+              "国有",
+              "上市"
+            ]
+          }
+        ],
+        "关系网络": [
+          {
+            "relation": "制度依赖",
+            "target": "法律体系",
+            "description": "依赖法律承认"
+          },
+          {
+            "relation": "经济功能",
+            "target": "市场",
+            "description": "参与市场活动"
+          },
+          {
+            "relation": "雇佣关系",
+            "target": "员工",
+            "description": "雇佣员工"
+          }
+        ],
+        "本体论问题": [
+          {
+            "question": "公司是实在的吗？",
+            "discussion": "作为制度实体，其存在依赖于集体意向性（约翰·塞尔理论）"
+          },
+          {
+            "question": "公司的边界在哪里？",
+            "discussion": "子公司、外包、合作伙伴的界限问题"
+          }
+        ]
+      }
+    }
+  },
+  "analysis_rules": {
+    "层次识别": {
+      "物理层指标": [
+        "材料",
+        "物质",
+        "物理结构",
+        "重量",
+        "尺寸"
+      ],
+      "化学层指标": [
+        "化学成分",
+        "材料属性",
+        "反应"
+      ],
+      "生物层指标": [
+        "生命",
+        "生长",
+        "代谢",
+        "有机"
+      ],
+      "人工层指标": [
+        "制造",
+        "设计",
+        "功能",
+        "工具",
+        "机器"
+      ],
+      "认知层指标": [
+        "思想",
+        "概念",
+        "意图",
+        "意义"
+      ],
+      "社会层指标": [
+        "制度",
+        "组织",
+        "法律",
+        "文化",
+        "经济"
+      ],
+      "信息层指标": [
+        "数据",
+        "符号",
+        "表示",
+        "编码"
+      ]
+    },
+    "属性识别": {
+      "本质属性规则": [
+        "如果缺少该属性，事物不再是该事物",
+        "定义中明确提到的核心特征",
+        "功能性的核心能力"
+      ],
+      "偶然属性规则": [
+        "可以变化而不改变事物身份",
+        "描述性特征",
+        "可测量的量化属性"
+      ]
+    },
+    "关系识别": {
+      "部分-整体": [
+        "包含",
+        "由...组成",
+        "部分",
+        "组件"
+      ],
+      "类型-实例": [
+        "是",
+        "属于",
+        "类别"
+      ],
+      "因果关系": [
+        "导致",
+        "产生",
+        "引起"
+      ],
+      "功能关系": [
+        "用于",
+        "功能是",
+        "目的是"
+      ]
+    }
+  }
+}

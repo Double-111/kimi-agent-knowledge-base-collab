@@ -1,0 +1,291 @@
+{
+  "metadata": {
+    "title": "形式本体论框架",
+    "created_by": "形式本体论专家",
+    "version": "1.0",
+    "description": "计算机科学和信息科学中的形式化本体结构"
+  },
+  "upper_ontologies": {
+    "BFO": {
+      "name": "Basic Formal Ontology",
+      "description": "基本形式本体论，生物医学领域最广泛使用的顶层本体",
+      "developer": "Barry Smith 等",
+      "domains": [
+        "生物医学",
+        "生命科学"
+      ],
+      "structure": {
+        "continuant": {
+          "definition": "在时间中持续存在、在某一时刻完全呈现的存在者",
+          "subtypes": [
+            "Independent Continuant（独立持续体）- 物质实体",
+            "Generically Dependent Continuant（类属依赖持续体）- 信息",
+            "Specifically Dependent Continuant（特定依赖持续体）- 性质、角色"
+          ]
+        },
+        "occurrent": {
+          "definition": "发生在时间中、具有时间部分的过程或事件",
+          "subtypes": [
+            "Process（过程）- 有界时间延展",
+            "Process Boundary（过程边界）- 瞬间",
+            "Temporal Region（时间区域）- 时间点或时段"
+          ]
+        }
+      }
+    },
+    "DOLCE": {
+      "name": "Descriptive Ontology for Linguistic and Cognitive Engineering",
+      "description": "为语言和认知工程设计的描述性本体论",
+      "developer": "意大利CNR",
+      "characteristics": "认知导向、紧密连接语言",
+      "categories": [
+        "Physical Object（物理对象）",
+        "Physical Quality（物理性质）",
+        "Abstract Quality（抽象性质）",
+        "Perdurant（持续体/过程）",
+        "Stative（静态）",
+        "Event（事件）",
+        "Achievement（成就）",
+        "Accomplishment（完成）"
+      ]
+    },
+    "SUMO": {
+      "name": "Suggested Upper Merged Ontology",
+      "description": "建议上层合并本体论，最大的公开顶层本体",
+      "developer": "IEEE标准",
+      "size": "约20,000个术语，70,000条公理",
+      "domains": [
+        "通用",
+        "跨领域"
+      ],
+      "structure": [
+        "Physical（物理）",
+        "Abstract（抽象）",
+        "SetOrClass（集合或类）",
+        "Relation（关系）",
+        "Quantity（量）",
+        "Process（过程）"
+      ]
+    },
+    "Cyc": {
+      "name": "Cyc Ontology",
+      "description": "最庞大的常识知识本体",
+      "developer": "Cycorp公司",
+      "size": "数百万条概念和规则",
+      "focus": "常识推理、自然语言理解"
+    }
+  },
+  "basic_formal_relations": {
+    "part_whole": {
+      "name": "部分-整体关系",
+      "formal_name": "mereology",
+      "axioms": {
+        "reflexivity": "∀x: P(x, x) - 自反性",
+        "antisymmetry": "∀x,y: P(x,y) ∧ P(y,x) → x=y - 反对称性",
+        "transitivity": "∀x,y,z: P(x,y) ∧ P(y,z) → P(x,z) - 传递性"
+      },
+      "types": [
+        "proper_part（真部分）",
+        "overlapping（重叠）",
+        "sum（和）",
+        "product（积）",
+        "difference（差）"
+      ]
+    },
+    "type_instance": {
+      "name": "类型-实例关系",
+      "description": "类与其实例之间的例示关系",
+      "formal_notation": "InstanceOf(i, C)",
+      "characteristics": [
+        "非自反",
+        "非对称",
+        "非传递"
+      ],
+      "related": [
+        "rdf:type",
+        " instantiation"
+      ]
+    },
+    "class_subclass": {
+      "name": "类-子类关系",
+      "description": "概念层次中的包含关系",
+      "formal_notation": "SubClassOf(C, D)",
+      "axioms": {
+        "reflexivity": "每个类是自己的子类",
+        "antisymmetry": "双向包含意味着等同",
+        "transitivity": "子类的子类仍是子类"
+      }
+    },
+    "attribution": {
+      "name": "属性归属关系",
+      "description": "实体具有某种属性或值",
+      "types": [
+        "数据属性（Data Property）- 关联字面量",
+        "对象属性（Object Property）- 关联实体"
+      ]
+    },
+    "identity": {
+      "name": "同一性关系",
+      "criteria": [
+        "莱布尼茨律：不可分辨者的同一性",
+        "时空连续性",
+        "因果连续性",
+        "结构连续性"
+      ],
+      "problems": [
+        "跨时间同一性",
+        "跨可能世界同一性"
+      ]
+    }
+  },
+  "property_system": {
+    "data_properties": {
+      "description": "关联个体与数据值的属性",
+      "types": [
+        "字符串（xsd:string）",
+        "整数（xsd:integer）",
+        "小数（xsd:decimal）",
+        "布尔（xsd:boolean）",
+        "日期时间（xsd:dateTime）"
+      ],
+      "characteristics": [
+        "函数性",
+        "反函数性"
+      ]
+    },
+    "object_properties": {
+      "description": "关联两个个体的属性",
+      "characteristics": {
+        "functional": "每个主体最多一个客体",
+        "inverseFunctional": "每个客体最多一个主体",
+        "transitive": "传递性",
+        "symmetric": "对称性",
+        "asymmetric": "反对称性",
+        "reflexive": "自反性",
+        "irreflexive": "反自反性"
+      }
+    },
+    "annotation_properties": {
+      "description": "用于注释和元数据的属性",
+      "examples": [
+        "rdfs:label",
+        "rdfs:comment",
+        "dc:creator",
+        "versionInfo"
+      ]
+    }
+  },
+  "ontology_methodology": {
+    "lifecycle": [
+      "1. 需求分析（确定范围和目的）",
+      "2. 知识获取（领域专家、文档）",
+      "3. 概念化（定义类和关系）",
+      "4. 形式化（用本体语言编码）",
+      "5. 集成（与现有本体对齐）",
+      "6. 评估（一致性、完整性）",
+      "7. 文档化",
+      "8. 维护（版本更新）"
+    ],
+    "design_principles": [
+      "清晰性（Clarity）- 明确定义",
+      "一致性（Coherence）- 逻辑一致",
+      "可扩展性（Extensibility）- 易于扩展",
+      "最小本体承诺（Minimal Ontological Commitment）",
+      "本体论区分（Ontological Distinctions）- 区分不同类别"
+    ],
+    "modularity": {
+      "approaches": [
+        "导入机制",
+        "模块分割",
+        "视图提取"
+      ],
+      "benefits": [
+        "可重用性",
+        "可维护性",
+        "并行开发"
+      ]
+    }
+  },
+  "logical_foundations": {
+    "description_logic": {
+      "name": "描述逻辑",
+      "description": "知识表示的形式化逻辑家族",
+      "complexity": "ALC到SROIQ的复杂度谱系",
+      "applications": [
+        "OWL本体",
+        "知识图谱",
+        "语义网"
+      ],
+      "constructors": [
+        "交",
+        "并",
+        "补",
+        "存在限制",
+        "全称限制",
+        "数量限制"
+      ]
+    },
+    "first_order_logic": {
+      "name": "一阶逻辑",
+      "description": "本体论的形式化基础",
+      "expressiveness": "高，但不可判定",
+      "tradeoff": "表达力 vs 计算复杂度"
+    },
+    "modal_logic": {
+      "name": "模态逻辑",
+      "description": "处理必然性和可能性的逻辑",
+      "types": [
+        "命题模态逻辑",
+        "一阶模态逻辑",
+        "时态逻辑"
+      ],
+      "ontology": "可能世界语义学"
+    }
+  },
+  "ontology_languages": {
+    "RDF": {
+      "name": "Resource Description Framework",
+      "description": "资源描述框架，三元组模型",
+      "structure": "主语-谓语-宾语（S-P-O）",
+      "serialization": [
+        "Turtle",
+        "JSON-LD",
+        "XML"
+      ]
+    },
+    "RDFS": {
+      "name": "RDF Schema",
+      "description": "RDF的词汇描述语言",
+      "features": [
+        "类定义",
+        "属性定义",
+        "层次关系"
+      ]
+    },
+    "OWL": {
+      "name": "Web Ontology Language",
+      "description": "万维网本体语言",
+      "species": [
+        "OWL Lite",
+        "OWL DL",
+        "OWL Full"
+      ],
+      "version": [
+        "OWL 1",
+        "OWL 2（增加属性链、键、数据范围等）"
+      ],
+      "expressiveness": "描述逻辑家族"
+    },
+    "SKOS": {
+      "name": "Simple Knowledge Organization System",
+      "description": "简单知识组织系统",
+      "use_case": "词表、分类法、叙词表",
+      "relations": [
+        "broader",
+        "narrower",
+        "related",
+        "exactMatch"
+      ]
+    }
+  }
+}

@@ -1,0 +1,286 @@
+{
+  "metadata": {
+    "title": "本体论知识库技术架构",
+    "created_by": "系统架构师",
+    "version": "1.0",
+    "description": "本体论知识库的技术实现架构"
+  },
+  "data_model": {
+    "core_structure": {
+      "entity": {
+        "properties": [
+          "id - 唯一标识符",
+          "name - 实体名称",
+          "type - 实体类型（概念/实例）",
+          "definition - 定义",
+          "description - 详细描述",
+          "domain - 所属领域",
+          "level - 本体层次",
+          "created_at - 创建时间",
+          "updated_at - 更新时间"
+        ]
+      },
+      "relation": {
+        "properties": [
+          "id - 唯一标识符",
+          "source_id - 源实体ID",
+          "target_id - 目标实体ID",
+          "relation_type - 关系类型",
+          "properties - 关系属性",
+          "confidence - 置信度"
+        ]
+      },
+      "hierarchy": {
+        "properties": [
+          "node_id - 节点ID",
+          "parent_id - 父节点ID",
+          "depth - 深度",
+          "path - 路径"
+        ]
+      }
+    },
+    "json_ld_schema": {
+      "context": {
+        "@vocab": "http://ontology-knowledge-base.org/",
+        "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+        "owl": "http://www.w3.org/2002/07/owl#",
+        "skos": "http://www.w3.org/2004/02/skos/core#"
+      },
+      "example": {
+        "@id": "entity_001",
+        "@type": "Concept",
+        "name": "实体",
+        "definition": "独立存在的对象",
+        "broader": "存在",
+        "narrower": [
+          "物质实体",
+          "抽象实体"
+        ],
+        "related": [
+          "属性",
+          "关系"
+        ]
+      }
+    }
+  },
+  "api_design": {
+    "restful_endpoints": {
+      "entities": {
+        "GET /api/entities": "获取实体列表（支持分页、过滤、排序）",
+        "GET /api/entities/{id}": "获取特定实体详情",
+        "POST /api/entities": "创建新实体",
+        "PUT /api/entities/{id}": "更新实体",
+        "DELETE /api/entities/{id}": "删除实体",
+        "GET /api/entities/search?q={query}": "搜索实体"
+      },
+      "relations": {
+        "GET /api/relations": "获取关系列表",
+        "GET /api/relations/{id}": "获取特定关系",
+        "POST /api/relations": "创建关系",
+        "GET /api/entities/{id}/relations": "获取实体的所有关系"
+      },
+      "hierarchy": {
+        "GET /api/hierarchy": "获取完整层次结构",
+        "GET /api/hierarchy/{domain}": "获取特定领域的层次",
+        "GET /api/entities/{id}/children": "获取子实体",
+        "GET /api/entities/{id}/parents": "获取父实体",
+        "GET /api/entities/{id}/path": "获取实体路径"
+      },
+      "query": {
+        "POST /api/query/sparql": "SPARQL查询端点",
+        "POST /api/query/natural": "自然语言查询",
+        "GET /api/query/suggest?q={partial}": "查询建议"
+      }
+    },
+    "graphql_schema": {
+      "types": [
+        "Entity - 实体类型",
+        "Relation - 关系类型",
+        "HierarchyNode - 层次节点",
+        "QueryResult - 查询结果"
+      ],
+      "queries": [
+        "entity(id: ID!): Entity",
+        "entities(filter: Filter, pagination: Pagination): [Entity]",
+        "search(query: String!): [SearchResult]",
+        "hierarchy(root: ID): HierarchyNode",
+        "path(from: ID!, to: ID!): [Entity]"
+      ],
+      "mutations": [
+        "createEntity(input: EntityInput!): Entity",
+        "updateEntity(id: ID!, input: EntityInput!): Entity",
+        "createRelation(input: RelationInput!): Relation"
+      ]
+    }
+  },
+  "frontend_architecture": {
+    "framework": "React + TypeScript + Vite",
+    "ui_library": "Tailwind CSS + shadcn/ui",
+    "state_management": "Zustand / React Query",
+    "routing": "React Router",
+    "components": {
+      "layout": [
+        "Header - 导航头",
+        "Sidebar - 侧边栏导航",
+        "MainContent - 主内容区",
+        "Footer - 页脚"
+      ],
+      "entity": [
+        "EntityCard - 实体卡片",
+        "EntityDetail - 实体详情",
+        "EntityForm - 实体编辑表单",
+        "EntityList - 实体列表"
+      ],
+      "visualization": [
+        "HierarchyTree - 层次树",
+        "KnowledgeGraph - 知识图谱",
+        "RelationNetwork - 关系网络",
+        "Breadcrumb - 面包屑导航"
+      ],
+      "search": [
+        "SearchBar - 搜索框",
+        "SearchResults - 搜索结果",
+        "FilterPanel - 过滤面板",
+        "AutoSuggest - 自动建议"
+      ]
+    }
+  },
+  "knowledge_visualization": {
+    "hierarchy_view": {
+      "description": "层次结构可视化",
+      "implementations": [
+        "树状图（Tree）- 传统层次展示",
+        "径向树（Radial Tree）- 空间优化",
+        "缩进列表（Indent List）- 紧凑展示",
+        "可折叠树（Collapsible Tree）- 交互式"
+      ],
+      "interactions": [
+        "展开/折叠",
+        "拖拽",
+        "缩放",
+        "聚焦"
+      ]
+    },
+    "graph_view": {
+      "description": "关系网络可视化",
+      "implementations": [
+        "力导向图（Force-directed）- 自然布局",
+        "圆形布局（Circular）- 对称展示",
+        "层次布局（Hierarchical）- 有向图",
+        "网格布局（Grid）- 规整排列"
+      ],
+      "interactions": [
+        "拖拽节点",
+        "缩放",
+        "高亮邻居",
+        "过滤"
+      ]
+    },
+    "matrix_view": {
+      "description": "关系矩阵可视化",
+      "use_case": "展示实体间的关系密度",
+      "interactions": [
+        "排序",
+        "筛选",
+        "单元格详情"
+      ]
+    }
+  },
+  "search_query": {
+    "full_text_search": {
+      "engine": "Elasticsearch / Meilisearch",
+      "features": [
+        "分词（中文/英文）",
+        "同义词扩展",
+        "模糊匹配",
+        "相关性排序",
+        "高亮显示"
+      ]
+    },
+    "semantic_search": {
+      "approach": "向量嵌入 + 相似度计算",
+      "embedding_model": "BERT/Word2Vec/Sentence-BERT",
+      "features": [
+        "语义相似度匹配",
+        "概念扩展",
+        "上下文理解"
+      ]
+    },
+    "sparql_query": {
+      "endpoint": "/api/query/sparql",
+      "features": [
+        "标准SPARQL 1.1支持",
+        "查询优化",
+        "结果格式化（JSON/XML）"
+      ],
+      "example_queries": [
+        "查询某概念的所有子类",
+        "查找两个概念间的关系路径",
+        "统计各领域的概念数量"
+      ]
+    },
+    "natural_language_query": {
+      "approach": "NL2SPARQL / 大语言模型",
+      "pipeline": [
+        "意图识别",
+        "实体链接",
+        "查询生成",
+        "结果解释"
+      ]
+    }
+  },
+  "extensibility": {
+    "modular_design": {
+      "principle": "高内聚、低耦合",
+      "modules": [
+        "core - 核心本体",
+        "domain-physics - 物理领域",
+        "domain-biology - 生物领域",
+        "domain-cognition - 认知领域",
+        "domain-society - 社会领域"
+      ]
+    },
+    "plugin_system": {
+      "description": "插件化扩展机制",
+      "types": [
+        "DataSourcePlugin - 数据源插件",
+        "VisualizationPlugin - 可视化插件",
+        "QueryPlugin - 查询插件",
+        "ExportPlugin - 导出插件"
+      ]
+    },
+    "import_export": {
+      "formats": [
+        "JSON-LD - 语义网标准",
+        "RDF/XML - RDF序列化",
+        "Turtle - 可读RDF格式",
+        "OWL/XML - OWL本体",
+        "CSV - 表格数据",
+        "GraphML - 图数据"
+      ]
+    }
+  },
+  "technology_stack": {
+    "frontend": [
+      "React 18",
+      "TypeScript",
+      "Vite",
+      "Tailwind CSS",
+      "shadcn/ui"
+    ],
+    "backend": [
+      "Node.js/Express",
+      "Python/FastAPI"
+    ],
+    "database": [
+      "PostgreSQL（关系数据）",
+      "Neo4j（图数据）",
+      "Elasticsearch（搜索）"
+    ],
+    "deployment": [
+      "Docker",
+      "Nginx",
+      "CI/CD"
+    ]
+  }
+}
