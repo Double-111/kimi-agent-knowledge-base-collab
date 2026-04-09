@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -51,15 +51,18 @@ export function EntityDetail({ entity, relatedEntities = [], onSelectRelated }: 
 
   return (
     <ScrollArea className="h-full">
-      <Card className="border-l-4 border-l-primary">
-        <CardHeader className="pb-4">
-          <div className="flex items-start justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-primary/10 rounded-lg">
+      <Card className="overflow-hidden border-slate-200 shadow-sm">
+        <CardHeader className="pb-5 border-b bg-gradient-to-br from-white via-slate-50 to-blue-50/70">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex items-start gap-3">
+              <div className="p-3 bg-primary/10 rounded-2xl">
                 {typeIcons[entity.type] || <BookOpen className="w-5 h-5" />}
               </div>
               <div>
                 <CardTitle className="text-2xl font-bold">{entity.name}</CardTitle>
+                <CardDescription className="mt-2">
+                  当前正在阅读的知识节点，下面按“定义、属性、关联、来源”展开。
+                </CardDescription>
                 <div className="flex items-center gap-2 mt-2">
                   <Badge variant="outline">{entity.type}</Badge>
                   <Badge variant="secondary">{entity.domain}</Badge>
@@ -72,6 +75,21 @@ export function EntityDetail({ entity, relatedEntities = [], onSelectRelated }: 
               </div>
             </div>
           </div>
+
+          <div className="grid gap-3 md:grid-cols-3">
+            <div className="rounded-xl border bg-background/80 p-3">
+              <div className="text-xs text-muted-foreground">来源</div>
+              <div className="mt-1 font-medium">{entity.source}</div>
+            </div>
+            <div className="rounded-xl border bg-background/80 p-3">
+              <div className="text-xs text-muted-foreground">属性项</div>
+              <div className="mt-1 font-medium">{Object.keys(entity.properties || {}).length}</div>
+            </div>
+            <div className="rounded-xl border bg-background/80 p-3">
+              <div className="text-xs text-muted-foreground">相关实体</div>
+              <div className="mt-1 font-medium">{relatedEntities.length}</div>
+            </div>
+          </div>
         </CardHeader>
 
         <CardContent className="space-y-6">
@@ -81,7 +99,7 @@ export function EntityDetail({ entity, relatedEntities = [], onSelectRelated }: 
               <FileText className="w-4 h-4" />
               定义
             </h4>
-            <p className="text-base leading-relaxed bg-muted/50 p-4 rounded-lg">
+            <p className="text-base leading-relaxed bg-slate-50 p-5 rounded-xl border">
               {entity.definition || '暂无定义'}
             </p>
           </div>
@@ -98,7 +116,7 @@ export function EntityDetail({ entity, relatedEntities = [], onSelectRelated }: 
                 </h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {Object.entries(entity.properties).slice(0, 8).map(([key, value]) => (
-                    <div key={key} className="bg-muted/30 p-3 rounded-lg">
+                    <div key={key} className="bg-slate-50 p-4 rounded-xl border">
                       <span className="text-xs text-muted-foreground uppercase tracking-wider">
                         {key}
                       </span>
@@ -127,7 +145,7 @@ export function EntityDetail({ entity, relatedEntities = [], onSelectRelated }: 
                     <Badge
                       key={related.id}
                       variant="outline"
-                      className="cursor-pointer hover:bg-primary/10 transition-colors"
+                      className="cursor-pointer rounded-full px-3 py-1.5 hover:bg-primary/10 transition-colors"
                       onClick={() => onSelectRelated?.(related)}
                     >
                       {related.name}
@@ -140,9 +158,9 @@ export function EntityDetail({ entity, relatedEntities = [], onSelectRelated }: 
           )}
 
           {/* 元信息 */}
-          <div className="text-xs text-muted-foreground">
+          <div className="rounded-xl border bg-slate-50/80 p-4 text-xs text-muted-foreground">
             <p>ID: {entity.id}</p>
-            <p>来源: {entity.source}</p>
+            <p className="mt-1">来源: {entity.source}</p>
           </div>
         </CardContent>
       </Card>

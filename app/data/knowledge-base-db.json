@@ -1,0 +1,473 @@
+{
+  "analysis_records": {
+    "存在": {
+      "entity_name": "存在",
+      "primary_level": "哲学层",
+      "secondary_levels": [
+        "形而上学",
+        "知识表示"
+      ],
+      "ontology_breakdown": {
+        "entity_level": {
+          "main_level": "存在论核心概念",
+          "physical_basis": "不是单一物质对象，而是对一切对象的最一般规定",
+          "social_dimension": "在哲学传统中承载本体论问题的讨论入口"
+        },
+        "essential_attributes": [
+          {
+            "attribute": "普遍性",
+            "description": "适用于一切可被谈论和思考的对象",
+            "necessity": "必要"
+          },
+          {
+            "attribute": "奠基性",
+            "description": "是其他本体概念如实体、属性、关系的上位问题",
+            "necessity": "必要"
+          },
+          {
+            "attribute": "可区分性",
+            "description": "可进一步区分为现实、可能、必然、偶然等存在方式",
+            "necessity": "重要"
+          }
+        ],
+        "accidental_attributes": [
+          {
+            "attribute": "哲学立场",
+            "examples": [
+              "实在论",
+              "唯名论",
+              "现象学"
+            ]
+          },
+          {
+            "attribute": "讨论语境",
+            "examples": [
+              "古希腊哲学",
+              "中世纪经院哲学",
+              "现代分析哲学"
+            ]
+          }
+        ],
+        "components": [
+          {
+            "part": "存在方式",
+            "function": "区分不同类型或模态的存在",
+            "ontology_relation": "整体-部分"
+          },
+          {
+            "part": "存在者",
+            "function": "作为存在问题的具体承担者",
+            "ontology_relation": "抽象-实例"
+          }
+        ],
+        "relations": [
+          {
+            "relation": "上位概念",
+            "target": "实体",
+            "description": "实体是存在问题下更具体的对象形态"
+          },
+          {
+            "relation": "相关问题",
+            "target": "同一性",
+            "description": "存在者如何保持为同一个对象属于存在论延伸问题"
+          }
+        ],
+        "ontological_questions": [
+          {
+            "question": "存在是一种属性吗？",
+            "discussion": "这一问题关联康德对存在不是实在谓词的经典论述。"
+          },
+          {
+            "question": "不同类型的对象以同一种方式存在吗？",
+            "discussion": "抽象对象、物质对象、制度对象是否共享统一存在论框架。"
+          }
+        ],
+        "formalization": {
+          "RDF": "<存在> rdf:type <哲学概念> .",
+          "OWL": "Class: 存在 SubClassOf: 本体论核心概念",
+          "description_logic": "存在 ≡ 本体论核心概念 ⊓ ∃hasMode.存在方式"
+        }
+      }
+    },
+    "实体": {
+      "entity_name": "实体",
+      "primary_level": "哲学层",
+      "secondary_levels": [
+        "存在论",
+        "范畴论"
+      ],
+      "ontology_breakdown": {
+        "entity_level": {
+          "main_level": "存在者的基本承载单位",
+          "physical_basis": "可对应个体对象，也可对应形式化本体中的基本类项",
+          "social_dimension": "在法律、组织、制度语境中可延展为社会实体"
+        },
+        "essential_attributes": [
+          {
+            "attribute": "独立性",
+            "description": "能够相对独立地被指认和讨论",
+            "necessity": "必要"
+          },
+          {
+            "attribute": "同一性",
+            "description": "需要具备可持续识别的身份条件",
+            "necessity": "必要"
+          },
+          {
+            "attribute": "属性承载",
+            "description": "实体通常被看作属性和关系的承载者",
+            "necessity": "核心"
+          }
+        ],
+        "accidental_attributes": [
+          {
+            "attribute": "实体类型",
+            "examples": [
+              "物质实体",
+              "抽象实体",
+              "社会实体"
+            ]
+          },
+          {
+            "attribute": "规模",
+            "examples": [
+              "个体",
+              "集合",
+              "系统"
+            ]
+          }
+        ],
+        "components": [
+          {
+            "part": "本质属性",
+            "function": "定义实体为何物",
+            "ontology_relation": "实体-属性"
+          },
+          {
+            "part": "偶性属性",
+            "function": "描述实体的可变状态",
+            "ontology_relation": "实体-属性"
+          }
+        ],
+        "relations": [
+          {
+            "relation": "被规定为",
+            "target": "存在者",
+            "description": "实体是存在者中的一种关键类型"
+          },
+          {
+            "relation": "承载",
+            "target": "属性",
+            "description": "属性依附于实体并被实体承载"
+          }
+        ],
+        "ontological_questions": [
+          {
+            "question": "实体必须是物质对象吗？",
+            "discussion": "这一问题关系到抽象对象和制度对象能否被视为实体。"
+          },
+          {
+            "question": "集合或系统是否拥有独立实体地位？",
+            "discussion": "涉及整体与部分、系统与成员的本体地位区分。"
+          }
+        ],
+        "formalization": {
+          "RDF": "<实体> rdf:type <哲学概念> .",
+          "OWL": "Class: 实体 SubClassOf: 存在者",
+          "description_logic": "实体 ≡ 存在者 ⊓ ∃bears.属性"
+        }
+      }
+    },
+    "公司": {
+      "entity_name": "公司",
+      "primary_level": "社会层",
+      "secondary_levels": [
+        "制度实体",
+        "经济组织"
+      ],
+      "ontology_breakdown": {
+        "entity_level": {
+          "main_level": "制度化社会实体",
+          "physical_basis": "由人员、资产、文档和业务流程构成运作载体",
+          "social_dimension": "依赖法律承认、组织治理与社会协作"
+        },
+        "essential_attributes": [
+          {
+            "attribute": "法律人格",
+            "description": "能够以组织名义承担权利义务",
+            "necessity": "必要"
+          },
+          {
+            "attribute": "组织目标",
+            "description": "围绕盈利、服务或治理等目标组织活动",
+            "necessity": "必要"
+          },
+          {
+            "attribute": "成员结构",
+            "description": "由管理者、员工、股东等角色共同支撑",
+            "necessity": "必要"
+          }
+        ],
+        "accidental_attributes": [
+          {
+            "attribute": "经营行业",
+            "examples": [
+              "科技",
+              "金融",
+              "制造"
+            ]
+          },
+          {
+            "attribute": "所有制结构",
+            "examples": [
+              "私营",
+              "国有",
+              "上市"
+            ]
+          }
+        ],
+        "components": [
+          {
+            "part": "管理层",
+            "function": "决策与协调",
+            "ontology_relation": "集体-成员"
+          },
+          {
+            "part": "员工",
+            "function": "执行具体业务",
+            "ontology_relation": "集体-成员"
+          },
+          {
+            "part": "资产",
+            "function": "支撑组织运营",
+            "ontology_relation": "拥有-被拥有"
+          }
+        ],
+        "relations": [
+          {
+            "relation": "制度依赖",
+            "target": "法律体系",
+            "description": "公司依赖法律框架获得正式承认"
+          },
+          {
+            "relation": "参与",
+            "target": "市场",
+            "description": "通过交换、竞争和合作参与经济系统"
+          }
+        ],
+        "ontological_questions": [
+          {
+            "question": "公司是真实存在的对象还是制度构造？",
+            "discussion": "它兼具社会事实与法律构造双重面向。"
+          },
+          {
+            "question": "公司边界如何界定？",
+            "discussion": "子公司、外包团队、平台合作方都挑战传统边界。"
+          }
+        ],
+        "formalization": {
+          "RDF": "<公司> rdf:type <制度实体>, <经济组织> .",
+          "OWL": "Class: 公司 SubClassOf: 制度实体 and 经济组织",
+          "description_logic": "公司 ≡ 制度实体 ⊓ ∃hasStatus.法律人格 ⊓ ∃hasMember.角色"
+        }
+      }
+    }
+  },
+  "system_records": {
+    "存在": {
+      "entity": "存在",
+      "holistic_properties": [
+        "统摄性 - 作为最一般的问题框架统摄其他本体概念",
+        "层级连接性 - 将实体、属性、关系等概念组织为统一结构",
+        "问题生成性 - 会不断衍生关于对象、模态和同一性的后续问题"
+      ],
+      "boundary": {
+        "physical": "不存在直接物理边界，更多体现为概念边界",
+        "functional": "为其他本体概念提供判定和归属框架",
+        "cognitive": "由哲学传统、语言使用和理论选择共同塑造",
+        "dynamic": "随着讨论语境变化，边界会在形而上学、逻辑学和信息科学间移动"
+      },
+      "environment": {
+        "description": "存在问题嵌入于哲学理论、语言结构和知识表示系统中",
+        "inputs": [
+          "对象识别",
+          "语义分析",
+          "理论前设"
+        ],
+        "outputs": [
+          "本体分类",
+          "存在判断",
+          "概念框架"
+        ]
+      },
+      "feedback": {
+        "negative": [
+          "概念澄清会约束过度扩张的存在主张",
+          "逻辑检验会修正不一致的本体设定"
+        ],
+        "positive": [
+          "新的对象类型会推动更广泛的存在讨论",
+          "理论创新会扩大存在论框架的适用范围"
+        ]
+      },
+      "hierarchy": {
+        "subsystems": [
+          "存在方式分析",
+          "存在者分类",
+          "同一性与变化问题"
+        ],
+        "supersystems": [
+          "形而上学",
+          "哲学知识体系",
+          "语义与知识表示系统"
+        ]
+      },
+      "emergence_examples": [
+        "对象集合 → 本体分类原则",
+        "概念网络 → 存在论框架",
+        "理论争论 → 新的存在模态区分"
+      ],
+      "systems_questions": [
+        {
+          "question": "存在问题为什么会不断扩张？",
+          "analysis": "因为新对象类型和新理论会持续进入系统，使存在边界不断被重画。"
+        },
+        {
+          "question": "存在论能否完全脱离语言？",
+          "analysis": "难以完全脱离，语言结构会影响我们划分对象和提出本体问题的方式。"
+        }
+      ]
+    },
+    "实体": {
+      "entity": "实体",
+      "holistic_properties": [
+        "身份稳定性 - 让对象在变化中保持可识别",
+        "属性承载性 - 使属性与关系得以组织",
+        "层级可嵌套性 - 个体、集合与系统可形成嵌套结构"
+      ],
+      "boundary": {
+        "physical": "对物质对象来说边界通常是时空轮廓",
+        "functional": "对社会或抽象实体来说边界更多由功能和规则定义",
+        "cognitive": "观察者的分类方式会影响实体边界的识别",
+        "dynamic": "在系统中实体边界会因组织方式和任务上下文发生变化"
+      },
+      "environment": {
+        "description": "实体总是在属性、关系和环境条件中被识别和描述",
+        "inputs": [
+          "属性信息",
+          "关系网络",
+          "识别标准"
+        ],
+        "outputs": [
+          "对象分类",
+          "身份认定",
+          "系统角色"
+        ]
+      },
+      "feedback": {
+        "negative": [
+          "分类标准会抑制实体概念无限泛化",
+          "同一性条件会限制实体边界随意变化"
+        ],
+        "positive": [
+          "复杂系统可催生新的复合实体",
+          "制度安排会放大社会实体的影响力"
+        ]
+      },
+      "hierarchy": {
+        "subsystems": [
+          "本质属性",
+          "偶性属性",
+          "关系网络"
+        ],
+        "supersystems": [
+          "存在论框架",
+          "知识图谱",
+          "制度与组织系统"
+        ]
+      },
+      "emergence_examples": [
+        "零散属性 → 可识别对象",
+        "成员协作 → 组织实体",
+        "组件组合 → 功能系统"
+      ],
+      "systems_questions": [
+        {
+          "question": "实体边界由客观现实决定还是由分类规则决定？",
+          "analysis": "通常两者共同作用，物理约束与概念框架都参与实体识别。"
+        },
+        {
+          "question": "系统是否可以视为独立实体？",
+          "analysis": "当系统拥有稳定边界、持续身份和可识别功能时，通常可以。"
+        }
+      ]
+    },
+    "公司": {
+      "entity": "公司",
+      "holistic_properties": [
+        "组织协同 - 多角色协作形成单个成员不具备的能力",
+        "制度连续性 - 人员更替后组织仍可持续存在",
+        "市场适应性 - 在环境变化中调整结构和战略"
+      ],
+      "boundary": {
+        "physical": "办公场所、资产和文档只是部分物理载体",
+        "functional": "真正边界由治理结构、职责分工和业务流程定义",
+        "cognitive": "公众、员工、监管者对公司身份的认知共同塑造其边界",
+        "dynamic": "并购、拆分、外包和平台化会持续改变组织边界"
+      },
+      "environment": {
+        "description": "公司嵌入法律、市场、技术和社会舆论环境中",
+        "inputs": [
+          "资本",
+          "人才",
+          "政策规则",
+          "市场需求"
+        ],
+        "outputs": [
+          "产品与服务",
+          "利润与税收",
+          "社会影响",
+          "组织知识"
+        ]
+      },
+      "feedback": {
+        "negative": [
+          "合规与审计机制抑制组织失控",
+          "预算约束限制资源过度扩张"
+        ],
+        "positive": [
+          "品牌增长会带来更强市场吸附效应",
+          "网络效应会放大平台型公司的规模优势"
+        ]
+      },
+      "hierarchy": {
+        "subsystems": [
+          "治理系统",
+          "运营系统",
+          "财务系统",
+          "人力系统"
+        ],
+        "supersystems": [
+          "行业生态",
+          "资本市场",
+          "法律制度环境"
+        ]
+      },
+      "emergence_examples": [
+        "成员协作 → 组织能力",
+        "治理结构 → 制度稳定性",
+        "客户网络 → 品牌与市场势能"
+      ],
+      "systems_questions": [
+        {
+          "question": "公司是法律对象还是社会系统？",
+          "analysis": "它同时是制度对象与运行系统，二者共同构成其真实存在方式。"
+        },
+        {
+          "question": "平台化后公司的边界还清晰吗？",
+          "analysis": "会变得更模糊，合作方、生态伙伴和外包方共同参与价值创造。"
+        }
+      ]
+    }
+  }
+}

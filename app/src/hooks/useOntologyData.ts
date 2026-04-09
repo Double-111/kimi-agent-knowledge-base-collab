@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { fetchKnowledgeGraph, fetchOntologies, searchEntities as searchEntitiesRequest } from '@/lib/api';
 import type { KnowledgeGraphData, Entity, OntologyModule } from '@/types/ontology';
 
 export function useOntologyData() {
@@ -14,29 +15,15 @@ export function useOntologyData() {
       try {
         setLoading(true);
         
-        const [kgRes, philRes, formalRes, sciRes] = await Promise.all([
-          fetch('/data/knowledge-graph/unified-knowledge-graph.json'),
-          fetch('/data/core-ontology/philosophical-ontology.json'),
-          fetch('/data/core-ontology/formal-ontology.json'),
-          fetch('/data/domain-ontology/scientific-ontology.json')
-        ]);
-
-        if (!kgRes.ok) throw new Error('Failed to load knowledge graph');
-        if (!philRes.ok) throw new Error('Failed to load philosophical ontology');
-        if (!formalRes.ok) throw new Error('Failed to load formal ontology');
-        if (!sciRes.ok) throw new Error('Failed to load scientific ontology');
-
-        const [kgData, philData, formalData, sciData] = await Promise.all([
-          kgRes.json(),
-          philRes.json(),
-          formalRes.json(),
-          sciRes.json()
+        const [kgData, ontologies] = await Promise.all([
+          fetchKnowledgeGraph(),
+          fetchOntologies()
         ]);
 
         setKnowledgeGraph(kgData);
-        setPhilosophicalOntology(philData);
-        setFormalOntology(formalData);
-        setScientificOntology(sciData);
+        setPhilosophicalOntology(ontologies.philosophicalOntology);
+        setFormalOntology(ontologies.formalOntology);
+        setScientificOntology(ontologies.scientificOntology);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Unknown error');
       } finally {
@@ -51,15 +38,9 @@ export function useOntologyData() {
     return knowledgeGraph?.entity_index[id];
   };
 
-  const searchEntities = (query: string): Entity[] => {
-    if (!knowledgeGraph || !query.trim()) return [];
-    
-    const lowerQuery = query.toLowerCase();
-    return Object.values(knowledgeGraph.entity_index).filter(entity => 
-      entity.name.toLowerCase().includes(lowerQuery) ||
-      entity.definition.toLowerCase().includes(lowerQuery) ||
-      entity.domain.toLowerCase().includes(lowerQuery)
-    );
+  const searchEntities = async (query: string): Promise<Entity[]> => {
+    if (!query.trim()) return [];
+    return searchEntitiesRequest(query);
   };
 
   const getEntitiesByDomain = (domain: string): Entity[] => {

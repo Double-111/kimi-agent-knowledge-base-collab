@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -153,39 +153,73 @@ export function OntologyBrowser({
     : [];
 
   const selectedEntity = entities.find(e => e.id === selectedEntityId);
+  const domainCount = Object.keys(entitiesByDomain).length;
 
   return (
-    <Card className="h-full">
-      <CardHeader className="pb-2">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-lg flex items-center gap-2">
-            <TreePine className="w-5 h-5" />
-            本体浏览器
-          </CardTitle>
-          <div className="flex items-center gap-1">
+    <Card className="h-full overflow-hidden border-slate-200 shadow-sm">
+      <CardHeader className="pb-4 border-b bg-gradient-to-br from-slate-50 via-white to-blue-50/60">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <TreePine className="w-5 h-5 text-primary" />
+              知识导航
+            </CardTitle>
+            <CardDescription className="mt-1">
+              先从领域进入，再选择概念查看详情和关系。
+            </CardDescription>
+          </div>
+          <div className="flex items-center gap-1 rounded-lg border bg-background/80 p-1">
             <button
               onClick={() => setViewMode('hierarchy')}
-              className={`p-2 rounded ${viewMode === 'hierarchy' ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+              className={`p-2 rounded-md ${viewMode === 'hierarchy' ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:text-foreground'}`}
               title="层次视图"
             >
               <TreePine className="w-4 h-4" />
             </button>
             <button
               onClick={() => setViewMode('list')}
-              className={`p-2 rounded ${viewMode === 'list' ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+              className={`p-2 rounded-md ${viewMode === 'list' ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:text-foreground'}`}
               title="列表视图"
             >
               <List className="w-4 h-4" />
             </button>
             <button
               onClick={() => setViewMode('relations')}
-              className={`p-2 rounded ${viewMode === 'relations' ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+              className={`p-2 rounded-md ${viewMode === 'relations' ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:text-foreground'}`}
               title="关系视图"
             >
               <Network className="w-4 h-4" />
             </button>
           </div>
         </div>
+
+        <div className="grid grid-cols-3 gap-3">
+          <div className="rounded-xl border bg-background/80 p-3">
+            <div className="text-xs text-muted-foreground">领域数</div>
+            <div className="mt-1 text-xl font-semibold">{domainCount}</div>
+          </div>
+          <div className="rounded-xl border bg-background/80 p-3">
+            <div className="text-xs text-muted-foreground">实体数</div>
+            <div className="mt-1 text-xl font-semibold">{entities.length}</div>
+          </div>
+          <div className="rounded-xl border bg-background/80 p-3">
+            <div className="text-xs text-muted-foreground">关系数</div>
+            <div className="mt-1 text-xl font-semibold">{crossReferences.length}</div>
+          </div>
+        </div>
+
+        {selectedEntity ? (
+          <div className="rounded-xl border bg-background/80 p-3">
+            <div className="text-xs text-muted-foreground">当前选中</div>
+            <div className="mt-1 flex items-center gap-2">
+              <span className="font-medium">{selectedEntity.name}</span>
+              <Badge variant="outline">{selectedEntity.domain}</Badge>
+            </div>
+            <p className="mt-2 text-sm text-muted-foreground line-clamp-2">
+              {selectedEntity.definition}
+            </p>
+          </div>
+        ) : null}
       </CardHeader>
       
       <CardContent className="p-0">
