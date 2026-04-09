@@ -175,8 +175,39 @@ function App() {
           </TabsList>
 
           <TabsContent value="browse" className="space-y-6">
+            <div className="rounded-3xl border bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950 text-white overflow-hidden">
+              <div className="grid gap-6 px-6 py-6 lg:grid-cols-[1.6fr_1fr] lg:px-8">
+                <div>
+                  <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs">
+                    <BookOpen className="w-3.5 h-3.5" />
+                    知识库主阅读区
+                  </div>
+                  <h2 className="mt-4 text-2xl font-semibold lg:text-3xl">
+                    从概念导航到详情阅读，先找到节点，再理解它的位置与关系
+                  </h2>
+                  <p className="mt-3 max-w-2xl text-sm text-slate-300 lg:text-base">
+                    页面会默认展示一个知识概念，你可以直接阅读定义、属性和关联内容。想换主题时，再从导航里切到别的概念即可。
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="rounded-2xl bg-white/10 p-4">
+                    <div className="text-xs text-slate-300">当前实体</div>
+                    <div className="mt-2 text-lg font-semibold">{selectedEntity?.name || '未选择'}</div>
+                  </div>
+                  <div className="rounded-2xl bg-white/10 p-4">
+                    <div className="text-xs text-slate-300">知识节点</div>
+                    <div className="mt-2 text-lg font-semibold">{entities.length}</div>
+                  </div>
+                  <div className="rounded-2xl bg-white/10 p-4">
+                    <div className="text-xs text-slate-300">概念关系</div>
+                    <div className="mt-2 text-lg font-semibold">{crossReferences.length}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-              {/* Sidebar - Ontology Browser */}
               <div className="hidden lg:block lg:col-span-4">
                 <OntologyBrowser 
                   entities={entities}
@@ -186,8 +217,25 @@ function App() {
                 />
               </div>
 
-              {/* Main Content - Entity Detail */}
               <div className="lg:col-span-8">
+                <div className="mb-4 grid gap-3 md:grid-cols-3">
+                  <div className="rounded-2xl border bg-card p-4">
+                    <div className="text-xs text-muted-foreground">当前阅读</div>
+                    <div className="mt-2 font-medium">{selectedEntity?.name || '系统已默认选中一个概念'}</div>
+                    <p className="mt-1 text-sm text-muted-foreground">打开页面后就可以直接看，不需要先操作。</p>
+                  </div>
+                  <div className="rounded-2xl border bg-card p-4">
+                    <div className="text-xs text-muted-foreground">阅读重点</div>
+                    <div className="mt-2 font-medium">先看定义，再看相关实体</div>
+                    <p className="mt-1 text-sm text-muted-foreground">能最快理解概念位置。</p>
+                  </div>
+                  <div className="rounded-2xl border bg-card p-4">
+                    <div className="text-xs text-muted-foreground">切换方式</div>
+                    <div className="mt-2 font-medium">想看别的概念，再从导航切换</div>
+                    <p className="mt-1 text-sm text-muted-foreground">不懂就去问答或分析，让系统继续解释当前实体。</p>
+                  </div>
+                </div>
+
                 <EntityDetail 
                   entity={selectedEntity}
                   relatedEntities={relatedEntities}
