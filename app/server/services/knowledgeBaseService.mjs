@@ -50,6 +50,90 @@ export class KnowledgeBaseService {
       || this.buildGenericSystemRecord(entityName);
   }
 
+  async getEducationContent(entityId) {
+    const entity = entityId ? await this.repository.getEntityById(entityId) : null;
+    const content = await this.repository.getEducationContent();
+
+    return {
+      ...content,
+      selected_entity_guide: entity
+        ? {
+            entity: entity.name,
+            why_it_matters: `${entity.name} 是理解 ${entity.domain} 领域的一个高频入口，适合拿来建立整体框架。`,
+            beginner_angle: `先把 ${entity.name} 当作一个“${entity.type}”来理解，再结合它的定义和相关实体去定位上下文。`,
+            connected_concepts: (await this.repository.getRelatedEntities(entity.id))
+              .slice(0, 4)
+              .map((item) => item.name),
+          }
+        : content.selected_entity_guide ?? null,
+    };
+  }
+
+  async getAboutContent() {
+    const knowledgeGraph = await this.repository.getKnowledgeGraph();
+    const baseContent = await this.repository.getAboutContent();
+
+    return {
+      ...baseContent,
+      metrics: {
+        provider: process.env.KNOWLEDGE_BASE_PROVIDER || "json",
+        entities: knowledgeGraph.statistics.total_entities,
+        relations: knowledgeGraph.statistics.total_relations,
+        domains: knowledgeGraph.statistics.domains.length,
+        levels: knowledgeGraph.statistics.levels.length,
+      },
+    };
+  }
+
+  async getEditorWorkspace(entityId) {
+    const entity = entityId ? await this.repository.getEntityById(entityId) : null;
+    const template = await this.repository.getEditorTemplate();
+    const fallbackEntity = entity || (await this.repository.listEntities())[0] || null;
+    const related = fallbackEntity
+      ? (await this.repository.getRelatedEntities(fallbackEntity.id)).slice(0, 4)
+      : [];
+
+    return {
+      entity_id: fallbackEntity?.id,
+      name: fallbackEntity?.name || template.defaults.name,
+      type: fallbackEntity?.type || template.defaults.type,
+      domain: fallbackEntity?.domain || template.defaults.domain,
+      source: fallbackEntity?.source || template.defaults.source,
+      definition: fallbackEntity?.definition || template.defaults.definition,
+      properties_text: JSON.stringify(fallbackEntity?.properties || template.defaults.properties, null, 2),
+      suggestions: {
+        recommended_type: fallbackEntity?.type || template.suggestions.recommended_type,
+        suggested_relations: related.length > 0
+          ? related.map((item) => item.name)
+          : template.suggestions.suggested_relations,
+        rdf_preview: `<${fallbackEntity?.name || template.defaults.name}> rdf:type <${fallbackEntity?.type || template.defaults.type}> .`,
+        owl_preview: `Class: ${fallbackEntity?.name || template.defaults.name} SubClassOf: ${fallbackEntity?.domain || template.defaults.domain}`,
+      },
+    };
+  }
+
+  async previewEditorDraft(input) {
+    const warnings = [];
+    if (!input.definition || input.definition.trim().length < 20) {
+      warnings.push("定义太短，建议至少说明对象是什么、属于哪个层级、和什么对象相关。");
+    }
+
+    if (!input.domain || !input.type) {
+      warnings.push("领域和类型最好都明确，否则后续很难接入真实数据库检索。");
+    }
+
+    const safeName = input.name?.trim() || "未命名概念";
+    const safeType = input.type?.trim() || "待定义类";
+    const safeDomain = input.domain?.trim() || "待定义领域";
+
+    return {
+      summary: `${safeName} 将作为 ${safeDomain} 下的 ${safeType} 被记录，当前定义会被用于检索、展示和问答上下文。`,
+      rdf: `<${safeName}> rdf:type <${safeType}> .\n<${safeName}> <belongsToDomain> <${safeDomain}> .`,
+      owl: `Class: ${safeName}\n  SubClassOf: ${safeDomain}\n  Annotations: rdfs:comment "${(input.definition || "").replaceAll('"', '\\"')}"`,
+      warnings,
+    };
+  }
+
   async resolveEntityName(query, entityId) {
     if (entityId) {
       const entity = await this.repository.getEntityById(entityId);

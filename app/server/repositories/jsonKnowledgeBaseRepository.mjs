@@ -105,4 +105,19 @@ export class JsonKnowledgeBaseRepository {
     const dataset = await this.loadDataset();
     return dataset.knowledgeBaseDb.system_records[entityName] || null;
   }
+
+  async getEducationContent() {
+    const dataset = await this.loadDataset();
+    return dataset.knowledgeBaseDb.education_content;
+  }
+
+  async getAboutContent() {
+    const dataset = await this.loadDataset();
+    return dataset.knowledgeBaseDb.about_content;
+  }
+
+  async getEditorTemplate() {
+    const dataset = await this.loadDataset();
+    return dataset.knowledgeBaseDb.editor_template;
+  }
 }
