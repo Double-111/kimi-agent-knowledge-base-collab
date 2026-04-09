@@ -134,6 +134,35 @@ const server = createServer(async (req, res) => {
       return;
     }
 
+    if (req.method === "GET" && url.pathname === "/api/education") {
+      sendJson(res, 200, await knowledgeBaseService.getEducationContent(url.searchParams.get("entityId") || undefined));
+      return;
+    }
+
+    if (req.method === "GET" && url.pathname === "/api/about") {
+      sendJson(res, 200, await knowledgeBaseService.getAboutContent());
+      return;
+    }
+
+    if (req.method === "GET" && url.pathname === "/api/editor/workspace") {
+      sendJson(res, 200, await knowledgeBaseService.getEditorWorkspace(url.searchParams.get("entityId") || undefined));
+      return;
+    }
+
+    if (req.method === "POST" && url.pathname === "/api/editor/preview") {
+      const body = await parseBody(req);
+      sendJson(res, 200, await knowledgeBaseService.previewEditorDraft({
+        entityId: typeof body.entityId === "string" ? body.entityId : undefined,
+        name: typeof body.name === "string" ? body.name : "",
+        type: typeof body.type === "string" ? body.type : "",
+        domain: typeof body.domain === "string" ? body.domain : "",
+        source: typeof body.source === "string" ? body.source : "",
+        definition: typeof body.definition === "string" ? body.definition : "",
+        propertiesText: typeof body.propertiesText === "string" ? body.propertiesText : "",
+      }));
+      return;
+    }
+
     if (req.method === "POST" && url.pathname === "/api/chat") {
       const body = await parseBody(req);
       const question = typeof body.question === "string" ? body.question.trim() : "";

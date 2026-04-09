@@ -34,4 +34,16 @@ export class DatabaseKnowledgeBaseRepository {
   async getSystemRecord() {
     throw new Error("DatabaseKnowledgeBaseRepository.getSystemRecord is not implemented yet");
   }
+
+  async getEducationContent() {
+    throw new Error("DatabaseKnowledgeBaseRepository.getEducationContent is not implemented yet");
+  }
+
+  async getAboutContent() {
+    throw new Error("DatabaseKnowledgeBaseRepository.getAboutContent is not implemented yet");
+  }
+
+  async getEditorTemplate() {
+    throw new Error("DatabaseKnowledgeBaseRepository.getEditorTemplate is not implemented yet");
+  }
 }

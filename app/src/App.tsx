@@ -10,18 +10,22 @@ import { StatsPanel } from '@/components/StatsPanel';
 import { OntologyAnalyzer } from '@/components/OntologyAnalyzer';
 import { SystemsOntologyView } from '@/components/SystemsOntologyView';
 import { OntologyAssistant } from '@/components/OntologyAssistant';
+import { EducationHub } from '@/components/EducationHub';
+import { OntologyEditor } from '@/components/OntologyEditor';
+import { AboutKnowledgeBase } from '@/components/AboutKnowledgeBase';
 import { 
   BookOpen, 
   Network, 
   BarChart3,
   Database,
   Menu,
-  Search,
   GitBranch,
   Layers,
   Sparkles,
   Boxes,
-  MessageSquareText
+  MessageSquareText,
+  GraduationCap,
+  FilePenLine
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -143,7 +147,7 @@ function App() {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-7 lg:w-auto lg:inline-grid">
+          <TabsList className="grid w-full grid-cols-9 lg:w-auto lg:inline-grid">
             <TabsTrigger value="browse" className="flex items-center gap-2">
               <BookOpen className="w-4 h-4" />
               <span className="hidden sm:inline">浏览</span>
@@ -159,6 +163,14 @@ function App() {
             <TabsTrigger value="systems" className="flex items-center gap-2">
               <Boxes className="w-4 h-4" />
               <span className="hidden sm:inline">系统</span>
+            </TabsTrigger>
+            <TabsTrigger value="editor" className="flex items-center gap-2">
+              <FilePenLine className="w-4 h-4" />
+              <span className="hidden sm:inline">编辑</span>
+            </TabsTrigger>
+            <TabsTrigger value="education" className="flex items-center gap-2">
+              <GraduationCap className="w-4 h-4" />
+              <span className="hidden sm:inline">科普</span>
             </TabsTrigger>
             <TabsTrigger value="graph" className="flex items-center gap-2">
               <Network className="w-4 h-4" />
@@ -183,10 +195,10 @@ function App() {
                     知识库主阅读区
                   </div>
                   <h2 className="mt-4 text-2xl font-semibold lg:text-3xl">
-                    从概念导航到详情阅读，先找到节点，再理解它的位置与关系
+                    左侧直接看概念摘要，右侧同步展开完整详情
                   </h2>
                   <p className="mt-3 max-w-2xl text-sm text-slate-300 lg:text-base">
-                    页面会默认展示一个知识概念，你可以直接阅读定义、属性和关联内容。想换主题时，再从导航里切到别的概念即可。
+                    页面打开后，左侧会直接列出几个核心概念的定义摘要，右侧保留主阅读区。你不需要先操作，就能同时看到概览和详细解释。
                   </p>
                 </div>
 
@@ -225,14 +237,14 @@ function App() {
                     <p className="mt-1 text-sm text-muted-foreground">打开页面后就可以直接看，不需要先操作。</p>
                   </div>
                   <div className="rounded-2xl border bg-card p-4">
-                    <div className="text-xs text-muted-foreground">阅读重点</div>
-                    <div className="mt-2 font-medium">先看定义，再看相关实体</div>
-                    <p className="mt-1 text-sm text-muted-foreground">能最快理解概念位置。</p>
+                    <div className="text-xs text-muted-foreground">左侧速览</div>
+                    <div className="mt-2 font-medium">多个概念摘要直接常驻显示</div>
+                    <p className="mt-1 text-sm text-muted-foreground">不用点开，也能先扫一眼差异和主题。</p>
                   </div>
                   <div className="rounded-2xl border bg-card p-4">
                     <div className="text-xs text-muted-foreground">切换方式</div>
-                    <div className="mt-2 font-medium">想看别的概念，再从导航切换</div>
-                    <p className="mt-1 text-sm text-muted-foreground">不懂就去问答或分析，让系统继续解释当前实体。</p>
+                    <div className="mt-2 font-medium">点击“设为主阅读”时才切换右侧详情</div>
+                    <p className="mt-1 text-sm text-muted-foreground">不点也能看摘要，想深入时再切换主阅读区。</p>
                   </div>
                 </div>
 
@@ -258,6 +270,14 @@ function App() {
 
           <TabsContent value="systems" className="space-y-6">
             <SystemsOntologyView selectedEntity={selectedEntity} />
+          </TabsContent>
+
+          <TabsContent value="editor" className="space-y-6">
+            <OntologyEditor selectedEntity={selectedEntity} />
+          </TabsContent>
+
+          <TabsContent value="education" className="space-y-6">
+            <EducationHub selectedEntity={selectedEntity} />
           </TabsContent>
 
           <TabsContent value="graph" className="space-y-6">
@@ -335,101 +355,7 @@ function App() {
           </TabsContent>
 
           <TabsContent value="about">
-            <div className="max-w-3xl mx-auto space-y-8">
-              <div className="text-center">
-                <h2 className="text-3xl font-bold mb-4">本体论知识库</h2>
-                <p className="text-lg text-muted-foreground">
-                  探索世界的本体结构，从哲学到科学的知识整合
-                </p>
-              </div>
-
-              <div className="bg-card border rounded-lg p-8">
-                <h3 className="text-xl font-semibold mb-4">什么是本体？</h3>
-                <p className="text-muted-foreground leading-relaxed mb-4">
-                  <strong>本体论（Ontology）</strong>是研究"存在"本身的哲学分支，探讨世界的基本结构、
-                  实体的本质、以及事物之间的关系。在信息科学中，本体是一种形式化的知识表示，
-                  定义了特定领域中的概念、属性和关系。
-                </p>
-                <p className="text-muted-foreground leading-relaxed">
-                  本知识库整合了<strong>三大本体论传统</strong>：
-                </p>
-                <ul className="mt-4 space-y-2 text-muted-foreground">
-                  <li className="flex items-start gap-2">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full mt-2" />
-                    <span><strong>哲学本体论</strong> - 从巴门尼德、亚里士多德到现代分析哲学，探讨存在、实体、属性、关系等根本问题</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full mt-2" />
-                    <span><strong>形式本体论</strong> - BFO、DOLCE、SUMO等顶层本体，以及OWL、RDF等本体语言标准</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <div className="w-2 h-2 bg-purple-500 rounded-full mt-2" />
-                    <span><strong>科学本体论</strong> - 从物理、化学、生物到认知、社会、信息的六层涌现结构</span>
-                  </li>
-                </ul>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-card border rounded-lg p-6">
-                  <h4 className="font-semibold mb-3 flex items-center gap-2">
-                    <Search className="w-5 h-5" />
-                    如何使用
-                  </h4>
-                  <ul className="space-y-2 text-sm text-muted-foreground">
-                    <li className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 bg-primary rounded-full" />
-                      <strong>浏览模式</strong> - 从层次树选择概念，查看详细定义
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 bg-primary rounded-full" />
-                      <strong>图谱模式</strong> - 可视化探索概念间的关系网络
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 bg-primary rounded-full" />
-                      <strong>搜索功能</strong> - 快速定位感兴趣的概念
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 bg-primary rounded-full" />
-                      <strong>关系视图</strong> - 查看概念间的映射和关联
-                    </li>
-                  </ul>
-                </div>
-
-                <div className="bg-card border rounded-lg p-6">
-                  <h4 className="font-semibold mb-3 flex items-center gap-2">
-                    <Database className="w-5 h-5" />
-                    数据规模
-                  </h4>
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center">
-                      <span className="text-muted-foreground">实体总数</span>
-                      <Badge variant="secondary">{entities.length}</Badge>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-muted-foreground">关系总数</span>
-                      <Badge variant="secondary">{crossReferences.length}</Badge>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-muted-foreground">领域覆盖</span>
-                      <Badge variant="secondary">{knowledgeGraph?.statistics?.domains?.length || 0}</Badge>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-muted-foreground">层次深度</span>
-                      <Badge variant="secondary">{knowledgeGraph?.statistics?.levels?.length || 0}</Badge>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-muted rounded-lg p-6 text-center">
-                <p className="text-sm text-muted-foreground">
-                  版本 1.0 | 构建日期: {new Date().toLocaleDateString('zh-CN')}
-                </p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  使用 React + TypeScript + Tailwind CSS 构建
-                </p>
-              </div>
-            </div>
+            <AboutKnowledgeBase />
           </TabsContent>
         </Tabs>
       </main>

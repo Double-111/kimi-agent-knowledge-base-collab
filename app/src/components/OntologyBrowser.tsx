@@ -1,22 +1,8 @@
-import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Tabs, TabsContent } from '@/components/ui/tabs';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { 
-  TreePine, 
-  Network, 
-  List, 
-  ChevronRight, 
-  ChevronDown,
-  BookOpen,
-  Layers,
-  Atom,
-  Link2,
-  Tag,
-  Info
-} from 'lucide-react';
-import type { Entity, CrossReference } from '@/types/ontology';
+import { BookOpen, Link2, Sparkles, TreePine } from 'lucide-react';
+import type { CrossReference, Entity } from '@/types/ontology';
 
 interface OntologyBrowserProps {
   entities: Entity[];
@@ -25,175 +11,48 @@ interface OntologyBrowserProps {
   selectedEntityId?: string;
 }
 
-interface TreeNodeProps {
-  entity: Entity;
-  entities: Entity[];
-  level: number;
-  selectedId?: string;
-  onSelect: (entity: Entity) => void;
-  expandedNodes: Set<string>;
-  onToggleExpand: (id: string) => void;
-}
-
-function TreeNode({ 
-  entity, 
-  entities, 
-  level, 
-  selectedId, 
-  onSelect,
-  expandedNodes,
-  onToggleExpand
-}: TreeNodeProps) {
-  const isExpanded = expandedNodes.has(entity.id);
-  const isSelected = entity.id === selectedId;
-  
-  // 查找子实体（同领域且可能相关）
-  const childEntities = entities.filter(e => 
-    e.domain === entity.domain && 
-    e.id !== entity.id &&
-    e.name !== entity.name
-  ).slice(0, 5);
-
-  const hasChildren = childEntities.length > 0;
-
-  const typeIcons: Record<string, React.ReactNode> = {
-    '哲学概念': <BookOpen className="w-4 h-4" />,
-    '形式概念': <Layers className="w-4 h-4" />,
-    '科学概念': <Atom className="w-4 h-4" />,
-  };
-
-  return (
-    <div className="select-none">
-      <div
-        className={`
-          flex items-center gap-2 py-2 px-3 rounded-lg cursor-pointer
-          transition-colors duration-200
-          ${isSelected ? 'bg-primary/10 border border-primary/30' : 'hover:bg-muted'}
-        `}
-        style={{ paddingLeft: `${level * 20 + 12}px` }}
-        onClick={() => onSelect(entity)}
-      >
-        {hasChildren && (
-          <span 
-            className="text-muted-foreground hover:text-foreground"
-            onClick={(e) => {
-              e.stopPropagation();
-              onToggleExpand(entity.id);
-            }}
-          >
-            {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-          </span>
-        )}
-        {!hasChildren && <span className="w-4" />}
-        
-        <span className="text-muted-foreground">
-          {typeIcons[entity.type] || <BookOpen className="w-4 h-4" />}
-        </span>
-        
-        <span className={`font-medium ${isSelected ? 'text-primary' : ''}`}>
-          {entity.name}
-        </span>
-        
-        <Badge variant="outline" className="text-xs ml-2">
-          {entity.domain}
-        </Badge>
-      </div>
-      
-      {isExpanded && hasChildren && (
-        <div className="mt-1">
-          {childEntities.map(child => (
-            <TreeNode
-              key={child.id}
-              entity={child}
-              entities={entities}
-              level={level + 1}
-              selectedId={selectedId}
-              onSelect={onSelect}
-              expandedNodes={expandedNodes}
-              onToggleExpand={onToggleExpand}
-            />
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-export function OntologyBrowser({ 
-  entities, 
-  crossReferences, 
-  onSelectEntity, 
-  selectedEntityId 
+export function OntologyBrowser({
+  entities,
+  crossReferences,
+  onSelectEntity,
+  selectedEntityId,
 }: OntologyBrowserProps) {
-  const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
-  const [viewMode, setViewMode] = useState<'hierarchy' | 'list' | 'relations'>('hierarchy');
+  const domainCount = new Set(entities.map((entity) => entity.domain)).size;
+  const selectedEntity = entities.find((entity) => entity.id === selectedEntityId) ?? entities[0];
 
-  const toggleExpand = (id: string) => {
-    const newExpanded = new Set(expandedNodes);
-    if (newExpanded.has(id)) {
-      newExpanded.delete(id);
-    } else {
-      newExpanded.add(id);
-    }
-    setExpandedNodes(newExpanded);
-  };
+  const spotlightEntities = selectedEntity
+    ? [
+        selectedEntity,
+        ...entities
+          .filter((entity) => entity.id !== selectedEntity.id)
+          .sort((left, right) => {
+            const leftScore = Number(left.domain === selectedEntity.domain);
+            const rightScore = Number(right.domain === selectedEntity.domain);
+            return rightScore - leftScore;
+          })
+          .slice(0, 5),
+      ]
+    : entities.slice(0, 6);
 
-  // 按领域分组
-  const entitiesByDomain = entities.reduce((acc, entity) => {
-    if (!acc[entity.domain]) {
-      acc[entity.domain] = [];
-    }
-    acc[entity.domain].push(entity);
-    return acc;
-  }, {} as Record<string, Entity[]>);
-
-  // 获取选中实体的关系
-  const selectedEntityRelations = selectedEntityId 
-    ? crossReferences.filter(ref => ref.source === selectedEntityId || ref.target === selectedEntityId)
+  const selectedRelations = selectedEntity
+    ? crossReferences.filter(
+        (reference) =>
+          reference.source === selectedEntity.id || reference.target === selectedEntity.id,
+      )
     : [];
-
-  const selectedEntity = entities.find(e => e.id === selectedEntityId);
-  const domainCount = Object.keys(entitiesByDomain).length;
 
   return (
     <Card className="h-full overflow-hidden border-slate-200 shadow-sm">
-      <CardHeader className="pb-4 border-b bg-gradient-to-br from-slate-50 via-white to-blue-50/60">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <TreePine className="w-5 h-5 text-primary" />
-              知识导航
-            </CardTitle>
-            <CardDescription className="mt-1">
-              先从领域进入，再选择概念查看详情和关系。
-            </CardDescription>
-          </div>
-          <div className="flex items-center gap-1 rounded-lg border bg-background/80 p-1">
-            <button
-              onClick={() => setViewMode('hierarchy')}
-              className={`p-2 rounded-md ${viewMode === 'hierarchy' ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:text-foreground'}`}
-              title="层次视图"
-            >
-              <TreePine className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => setViewMode('list')}
-              className={`p-2 rounded-md ${viewMode === 'list' ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:text-foreground'}`}
-              title="列表视图"
-            >
-              <List className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => setViewMode('relations')}
-              className={`p-2 rounded-md ${viewMode === 'relations' ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:text-foreground'}`}
-              title="关系视图"
-            >
-              <Network className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
+      <CardHeader className="border-b bg-gradient-to-br from-slate-50 via-white to-blue-50/70 pb-4">
+        <CardTitle className="flex items-center gap-2 text-lg">
+          <TreePine className="h-5 w-5 text-primary" />
+          概念速览
+        </CardTitle>
+        <CardDescription>
+          左侧直接展示几个核心概念的摘要，不用先点开才能看到内容。
+        </CardDescription>
 
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-3 gap-3 pt-1">
           <div className="rounded-xl border bg-background/80 p-3">
             <div className="text-xs text-muted-foreground">领域数</div>
             <div className="mt-1 text-xl font-semibold">{domainCount}</div>
@@ -207,187 +66,98 @@ export function OntologyBrowser({
             <div className="mt-1 text-xl font-semibold">{crossReferences.length}</div>
           </div>
         </div>
-
-        {selectedEntity ? (
-          <div className="rounded-xl border bg-background/80 p-3">
-            <div className="text-xs text-muted-foreground">当前选中</div>
-            <div className="mt-1 flex items-center gap-2">
-              <span className="font-medium">{selectedEntity.name}</span>
-              <Badge variant="outline">{selectedEntity.domain}</Badge>
-            </div>
-            <p className="mt-2 text-sm text-muted-foreground line-clamp-2">
-              {selectedEntity.definition}
-            </p>
-          </div>
-        ) : null}
       </CardHeader>
-      
-      <CardContent className="p-0">
-        <Tabs value={viewMode} className="w-full">
-          <TabsContent value="hierarchy" className="m-0">
-            <ScrollArea className="h-[500px]">
-              <div className="p-4 space-y-4">
-                {Object.entries(entitiesByDomain).map(([domain, domainEntities]) => (
-                  <div key={domain}>
-                    <div className="flex items-center gap-2 mb-2 px-3">
-                      <Layers className="w-4 h-4 text-muted-foreground" />
-                      <span className="font-semibold text-sm text-muted-foreground uppercase tracking-wider">
-                        {domain}
-                      </span>
-                      <Badge variant="secondary" className="text-xs">
-                        {domainEntities.length}
-                      </Badge>
-                    </div>
-                    <div className="space-y-1">
-                      {domainEntities.slice(0, 5).map(entity => (
-                        <TreeNode
-                          key={entity.id}
-                          entity={entity}
-                          entities={entities}
-                          level={0}
-                          selectedId={selectedEntityId}
-                          onSelect={onSelectEntity}
-                          expandedNodes={expandedNodes}
-                          onToggleExpand={toggleExpand}
-                        />
-                      ))}
-                      {domainEntities.length > 5 && (
-                        <div className="text-xs text-muted-foreground px-3 py-1">
-                          +{domainEntities.length - 5} 更多...
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </ScrollArea>
-          </TabsContent>
 
-          <TabsContent value="list" className="m-0">
-            <ScrollArea className="h-[500px]">
-              <div className="p-4">
-                <div className="space-y-2">
-                  {entities.map(entity => (
-                    <div
-                      key={entity.id}
-                      className={`
-                        flex items-center justify-between p-3 rounded-lg cursor-pointer
-                        transition-colors duration-200
-                        ${entity.id === selectedEntityId ? 'bg-primary/10 border border-primary/30' : 'hover:bg-muted border border-transparent'}
-                      `}
-                      onClick={() => onSelectEntity(entity)}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className={`
-                          w-3 h-3 rounded-full
-                          ${entity.type === '哲学概念' ? 'bg-blue-500' : ''}
-                          ${entity.type === '形式概念' ? 'bg-green-500' : ''}
-                          ${entity.type === '科学概念' ? 'bg-purple-500' : ''}
-                        `} />
-                        <div>
-                          <span className="font-medium">{entity.name}</span>
-                          <p className="text-xs text-muted-foreground line-clamp-1">
-                            {entity.definition}
-                          </p>
+      <CardContent className="p-0">
+        <ScrollArea className="h-[640px]">
+          <div className="space-y-4 p-4">
+            {selectedEntity ? (
+              <div className="rounded-2xl border bg-blue-50/70 p-4">
+                <div className="flex items-center gap-2 text-sm font-medium text-blue-950">
+                  <Sparkles className="h-4 w-4" />
+                  当前主阅读
+                </div>
+                <div className="mt-2 text-lg font-semibold">{selectedEntity.name}</div>
+                <p className="mt-2 text-sm leading-6 text-slate-700">{selectedEntity.definition}</p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <Badge variant="outline">{selectedEntity.type}</Badge>
+                  <Badge variant="secondary">{selectedEntity.domain}</Badge>
+                  <Badge variant="outline">{selectedRelations.length} 条关系</Badge>
+                </div>
+              </div>
+            ) : null}
+
+            <div className="rounded-2xl border bg-slate-50/80 p-4">
+              <div className="text-sm font-medium">旁边直接能看到什么</div>
+              <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                这里会直接展示概念名称、定义摘要、所属领域和关系数量。想切换右侧主阅读区时，再点“设为主阅读”就行。
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              {spotlightEntities.map((entity) => {
+                const isSelected = entity.id === selectedEntityId;
+                const relationCount = crossReferences.filter(
+                  (reference) =>
+                    reference.source === entity.id || reference.target === entity.id,
+                ).length;
+
+                return (
+                  <div
+                    key={entity.id}
+                    className={`rounded-2xl border p-4 transition-colors ${
+                      isSelected ? 'border-primary/40 bg-primary/5' : 'bg-background'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="font-semibold">{entity.name}</span>
+                          {isSelected ? <Badge variant="secondary">正在阅读</Badge> : null}
+                        </div>
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          <Badge variant="outline">{entity.domain}</Badge>
+                          <Badge variant="outline">{entity.type}</Badge>
+                          <Badge variant="outline">{relationCount} 条关系</Badge>
                         </div>
                       </div>
-                      <Badge variant="outline" className="text-xs">
-                        {entity.domain}
-                      </Badge>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </ScrollArea>
-          </TabsContent>
-
-          <TabsContent value="relations" className="m-0">
-            <ScrollArea className="h-[500px]">
-              <div className="p-4 space-y-4">
-                {selectedEntity ? (
-                  <>
-                    <div className="bg-muted/50 p-4 rounded-lg">
-                      <h4 className="font-semibold flex items-center gap-2 mb-2">
-                        <Info className="w-4 h-4" />
-                        选中实体
-                      </h4>
-                      <p className="text-lg font-medium">{selectedEntity.name}</p>
-                      <p className="text-sm text-muted-foreground">{selectedEntity.definition}</p>
                     </div>
 
-                    <div>
-                      <h4 className="font-semibold flex items-center gap-2 mb-3">
-                        <Link2 className="w-4 h-4" />
-                        关系 ({selectedEntityRelations.length})
-                      </h4>
-                      {selectedEntityRelations.length > 0 ? (
-                        <div className="space-y-2">
-                          {selectedEntityRelations.map((ref, index) => {
-                            const isSource = ref.source === selectedEntityId;
-                            const relatedId = isSource ? ref.target : ref.source;
-                            const relatedEntity = entities.find(e => e.id === relatedId);
-                            
-                            return (
-                              <div 
-                                key={index}
-                                className="flex items-center gap-3 p-3 bg-muted/30 rounded-lg"
-                              >
-                                <div className="flex items-center gap-2">
-                                  <span className="font-medium">{selectedEntity.name}</span>
-                                  <Badge variant="secondary" className="text-xs">
-                                    {ref.relation}
-                                  </Badge>
-                                </div>
-                                <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                                <span 
-                                  className="font-medium text-primary cursor-pointer hover:underline"
-                                  onClick={() => relatedEntity && onSelectEntity(relatedEntity)}
-                                >
-                                  {relatedEntity?.name || relatedId}
-                                </span>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      ) : (
-                        <p className="text-muted-foreground text-sm">暂无关系数据</p>
-                      )}
-                    </div>
-                  </>
-                ) : (
-                  <div className="text-center text-muted-foreground py-8">
-                    <Network className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                    <p>选择一个实体查看其关系</p>
-                  </div>
-                )}
+                    <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                      {entity.definition}
+                    </p>
 
-                <div>
-                  <h4 className="font-semibold flex items-center gap-2 mb-3">
-                    <Tag className="w-4 h-4" />
-                    所有关系 ({crossReferences.length})
-                  </h4>
-                  <div className="space-y-1 max-h-[200px] overflow-y-auto">
-                    {crossReferences.map((ref, index) => {
-                      const sourceEntity = entities.find(e => e.id === ref.source);
-                      const targetEntity = entities.find(e => e.id === ref.target);
-                      
-                      return (
-                        <div 
-                          key={index}
-                          className="flex items-center gap-2 text-sm p-2 hover:bg-muted/50 rounded"
+                    <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
+                      <div className="flex items-center gap-1">
+                        <Link2 className="h-3.5 w-3.5" />
+                        可继续延伸到关联概念
+                      </div>
+                      {!isSelected ? (
+                        <button
+                          type="button"
+                          onClick={() => onSelectEntity(entity)}
+                          className="rounded-full border px-3 py-1 font-medium text-foreground transition-colors hover:bg-slate-50"
                         >
-                          <span className="text-muted-foreground">{sourceEntity?.name || ref.source}</span>
-                          <Badge variant="outline" className="text-xs">{ref.relation}</Badge>
-                          <span className="text-muted-foreground">{targetEntity?.name || ref.target}</span>
-                        </div>
-                      );
-                    })}
+                          设为主阅读
+                        </button>
+                      ) : null}
+                    </div>
                   </div>
-                </div>
+                );
+              })}
+            </div>
+
+            <div className="rounded-2xl border bg-white p-4">
+              <div className="flex items-center gap-2 text-sm font-medium">
+                <BookOpen className="h-4 w-4 text-primary" />
+                使用方式
               </div>
-            </ScrollArea>
-          </TabsContent>
-        </Tabs>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                左侧先直接扫一眼多个概念摘要，右侧则保持完整详情。这样即使不点任何按钮，也能同时看到概念概览和主内容。
+              </p>
+            </div>
+          </div>
+        </ScrollArea>
       </CardContent>
     </Card>
   );
