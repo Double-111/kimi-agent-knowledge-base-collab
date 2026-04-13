@@ -1,42 +1,94 @@
-import { useState } from 'react';
-import { Search, Layers, Box, Link2, HelpCircle, FileCode, Sparkles } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { Search, Layers, Box, Link2, HelpCircle, FileCode, Sparkles, Database } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { fetchAnalysis, type AnalysisResult } from '@/lib/api';
+import type { Entity, KnowledgeLayer } from '@/types/ontology';
 
 interface OntologyAnalyzerProps {
-  onSelectConcept: (concept: string) => void;
+  entities: Entity[];
+  selectedEntity?: Entity | null;
+  onSelectEntity?: (entity: Entity) => void;
 }
 
-const examples = ['存在', '实体', '公司'];
+const layerLabels: Record<KnowledgeLayer, string> = {
+  common: 'Common',
+  domain: 'Domain',
+  private: 'Private',
+};
 
-export function OntologyAnalyzer({ onSelectConcept }: OntologyAnalyzerProps) {
+export function OntologyAnalyzer({ entities, selectedEntity, onSelectEntity }: OntologyAnalyzerProps) {
   const [input, setInput] = useState('');
   const [result, setResult] = useState<AnalysisResult | null>(null);
+  const [analyzedEntity, setAnalyzedEntity] = useState<Entity | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleAnalyze = async (value?: string) => {
+  const exampleEntities = useMemo(() => {
+    if (selectedEntity) {
+      return [
+        selectedEntity,
+        ...entities
+          .filter((entity) => entity.id !== selectedEntity.id)
+          .sort((left, right) => {
+            const leftScore = Number(left.domain === selectedEntity.domain);
+            const rightScore = Number(right.domain === selectedEntity.domain);
+            return rightScore - leftScore;
+          })
+          .slice(0, 5),
+      ];
+    }
+
+    return entities.slice(0, 6);
+  }, [entities, selectedEntity]);
+
+  const resolveEntity = (query: string): Entity | null => {
+    const normalized = query.trim().toLowerCase();
+    if (!normalized) {
+      return null;
+    }
+
+    return (
+      entities.find((entity) => entity.name.trim().toLowerCase() === normalized)
+      || entities.find((entity) => entity.name.includes(query.trim()))
+      || null
+    );
+  };
+
+  const handleAnalyze = async (value?: string, preferredEntity?: Entity | null) => {
     const query = (value ?? input).trim();
     if (!query) return;
+    const matchedEntity = preferredEntity || resolveEntity(query);
 
     setIsAnalyzing(true);
     setError(null);
 
     try {
-      const analysis = await fetchAnalysis(query);
+      const analysis = await fetchAnalysis(query, matchedEntity?.id);
       setInput(query);
       setResult(analysis);
-      onSelectConcept(query);
+      setAnalyzedEntity(matchedEntity);
+      if (matchedEntity && matchedEntity.id !== selectedEntity?.id) {
+        onSelectEntity?.(matchedEntity);
+      }
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : '分析失败');
     } finally {
       setIsAnalyzing(false);
     }
   };
+
+  useEffect(() => {
+    if (!selectedEntity) {
+      return;
+    }
+
+    setInput(selectedEntity.name);
+    void handleAnalyze(selectedEntity.name, selectedEntity);
+  }, [selectedEntity?.id]);
 
   return (
     <div className="space-y-6">
@@ -48,9 +100,30 @@ export function OntologyAnalyzer({ onSelectConcept }: OntologyAnalyzerProps) {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
+          <div className="rounded-2xl border bg-muted/30 p-4">
+            <div className="flex flex-wrap items-center gap-2">
+              <Database className="w-4 h-4 text-primary" />
+              <span className="text-sm font-medium">当前分析上下文来自 WiKiMG 导出的节点与关系</span>
+            </div>
+            {selectedEntity ? (
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Badge variant="outline">{selectedEntity.type}</Badge>
+                <Badge variant="secondary">{selectedEntity.domain}</Badge>
+                <Badge variant={selectedEntity.layer === 'private' ? 'destructive' : 'outline'}>
+                  {layerLabels[selectedEntity.layer]}
+                </Badge>
+                <Badge variant="outline">{selectedEntity.source}</Badge>
+              </div>
+            ) : (
+              <p className="mt-2 text-sm text-muted-foreground">
+                当前还没有选中节点，可以从浏览、图谱或搜索里先选一个实体。
+              </p>
+            )}
+          </div>
+
           <div className="flex gap-2">
             <Input
-              placeholder="输入知识库中的概念（如：存在、实体、公司）"
+              placeholder="输入当前 WiKiMG 知识库中的节点名称"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && void handleAnalyze()}
@@ -62,15 +135,15 @@ export function OntologyAnalyzer({ onSelectConcept }: OntologyAnalyzerProps) {
           </div>
 
           <div className="flex flex-wrap gap-2">
-            <span className="text-sm text-muted-foreground">知识库示例:</span>
-            {examples.map((example) => (
+            <span className="text-sm text-muted-foreground">当前 WiKiMG 节点:</span>
+            {exampleEntities.map((entity) => (
               <Badge
-                key={example}
+                key={entity.id}
                 variant="outline"
                 className="cursor-pointer hover:bg-primary/10"
-                onClick={() => void handleAnalyze(example)}
+                onClick={() => void handleAnalyze(entity.name, entity)}
               >
-                {example}
+                {entity.name}
               </Badge>
             ))}
           </div>
@@ -89,6 +162,14 @@ export function OntologyAnalyzer({ onSelectConcept }: OntologyAnalyzerProps) {
             <div className="flex flex-wrap items-center gap-3">
               <CardTitle>{result.entity_name}</CardTitle>
               <Badge>{result.primary_level}</Badge>
+              {analyzedEntity ? (
+                <>
+                  <Badge variant="secondary">{analyzedEntity.domain}</Badge>
+                  <Badge variant={analyzedEntity.layer === 'private' ? 'destructive' : 'outline'}>
+                    {layerLabels[analyzedEntity.layer]}
+                  </Badge>
+                </>
+              ) : null}
               {result.secondary_levels.map((level) => (
                 <Badge key={level} variant="outline">{level}</Badge>
               ))}

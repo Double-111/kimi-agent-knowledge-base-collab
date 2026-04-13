@@ -2,6 +2,33 @@ import type { Entity, KnowledgeGraphData, OntologyModule } from '@/types/ontolog
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? '';
 
+function parseSseEvent(rawEvent: string): { event: string; data: unknown } | null {
+  const lines = rawEvent
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean);
+  if (lines.length === 0) {
+    return null;
+  }
+
+  const eventLine = lines.find((line) => line.startsWith('event: '));
+  const dataLine = lines.find((line) => line.startsWith('data: '));
+  if (!eventLine || !dataLine) {
+    return null;
+  }
+
+  return {
+    event: eventLine.slice('event: '.length),
+    data: JSON.parse(dataLine.slice('data: '.length)),
+  };
+}
+
+function asObject(value: unknown): Record<string, unknown> | null {
+  return value && typeof value === 'object' && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : null;
+}
+
 async function parseJson<T>(response: Response): Promise<T> {
   if (!response.ok) {
     const text = await response.text();
@@ -33,14 +60,11 @@ export async function searchEntities(query: string): Promise<Entity[]> {
 export async function askOntologyAssistant(input: {
   question: string;
   entityId?: string;
-}): Promise<{
-  answer: string;
-  context?: {
-    entity?: Entity | null;
-    related?: Entity[];
-    searchHits?: Entity[];
-  };
-}> {
+  conversationId?: string;
+  businessPrompt?: string;
+  modelName?: string;
+  conversationHistory?: OntologyAssistantHistoryTurn[];
+}): Promise<OntologyAssistantResponse> {
   const response = await fetch(`${API_BASE}/api/chat`, {
     method: 'POST',
     headers: {
@@ -50,6 +74,204 @@ export async function askOntologyAssistant(input: {
   });
 
   return parseJson(response);
+}
+
+export interface OntologyAssistantContext {
+  entity?: Entity | null;
+  related?: Entity[];
+  searchHits?: Entity[];
+}
+
+export interface OntologyAssistantResponse {
+  answer: string;
+  context?: OntologyAssistantContext;
+  raw?: unknown;
+  stderr?: string;
+}
+
+export interface OntologyAssistantHistoryTurn {
+  question: string;
+  answer: string;
+}
+
+export interface OntologyAssistantToolStartedEvent {
+  callId: string;
+  command: string;
+  cwd: string | null;
+  startedAt: string;
+}
+
+export interface OntologyAssistantToolOutputEvent {
+  callId: string;
+  command: string;
+  stream: 'stdout' | 'stderr';
+  chunk: string;
+  cwd: string | null;
+  startedAt: string;
+}
+
+export interface OntologyAssistantToolFinishedEvent {
+  callId: string;
+  command: string;
+  status: 'running' | 'success' | 'error' | 'timeout' | 'cancelled' | 'rejected';
+  stdout: string;
+  stderr: string;
+  exitCode: number | null;
+  cwd: string | null;
+  durationMs: number | null;
+  startedAt: string;
+  finishedAt: string;
+}
+
+export interface PersistedOntologyAssistantToolRun {
+  callId: string;
+  command: string;
+  status: 'running' | 'success' | 'error' | 'timeout' | 'cancelled' | 'rejected';
+  stdout: string;
+  stderr: string;
+  exitCode: number | null;
+  cwd: string | null;
+  durationMs: number | null;
+  truncated: boolean;
+  startedAt: string | null;
+  finishedAt: string | null;
+}
+
+export interface PersistedOntologyAssistantMessage {
+  id: string;
+  question: string;
+  answer: string;
+  relatedNames: string[];
+  toolRuns: PersistedOntologyAssistantToolRun[];
+}
+
+export interface PersistedOntologyAssistantSession {
+  id: string;
+  title: string;
+  draftQuestion: string;
+  messages: PersistedOntologyAssistantMessage[];
+  error: string | null;
+  loading: boolean;
+  statusMessage: string | null;
+}
+
+export interface OntologyAssistantSessionState {
+  sessions: PersistedOntologyAssistantSession[];
+  activeSessionId: string;
+  businessPrompt: string;
+  modelName: string;
+}
+
+export interface OntologyAssistantStreamHandlers {
+  onStatus?: (message: string) => void;
+  onContext?: (context: OntologyAssistantContext) => void;
+  onAnswerDelta?: (delta: string) => void;
+  onToolStarted?: (event: OntologyAssistantToolStartedEvent) => void;
+  onToolOutput?: (event: OntologyAssistantToolOutputEvent) => void;
+  onToolFinished?: (event: OntologyAssistantToolFinishedEvent) => void;
+  onComplete?: (response: OntologyAssistantResponse) => void;
+}
+
+export async function fetchOntologyAssistantState(): Promise<OntologyAssistantSessionState> {
+  const response = await fetch(`${API_BASE}/api/chat/state`);
+  return parseJson<OntologyAssistantSessionState>(response);
+}
+
+export async function saveOntologyAssistantState(
+  input: OntologyAssistantSessionState,
+): Promise<OntologyAssistantSessionState> {
+  const response = await fetch(`${API_BASE}/api/chat/state`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(input),
+  });
+
+  return parseJson<OntologyAssistantSessionState>(response);
+}
+
+export async function askOntologyAssistantStream(
+  input: {
+    question: string;
+    entityId?: string;
+    conversationId?: string;
+    businessPrompt?: string;
+    modelName?: string;
+    conversationHistory?: OntologyAssistantHistoryTurn[];
+  },
+  handlers: OntologyAssistantStreamHandlers = {},
+  options: {
+    signal?: AbortSignal;
+  } = {},
+): Promise<OntologyAssistantResponse> {
+  const response = await fetch(`${API_BASE}/api/chat/stream`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(input),
+    signal: options.signal,
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(text || `Request failed with status ${response.status}`);
+  }
+
+  if (!response.body) {
+    throw new Error('Streaming response body is missing.');
+  }
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+  let finalResponse: OntologyAssistantResponse | null = null;
+
+  while (true) {
+    const { value, done } = await reader.read();
+    buffer += decoder.decode(value || new Uint8Array(), { stream: !done });
+
+    let boundary = buffer.indexOf('\n\n');
+    while (boundary !== -1) {
+      const rawEvent = buffer.slice(0, boundary);
+      buffer = buffer.slice(boundary + 2);
+      const parsed = parseSseEvent(rawEvent);
+      if (parsed) {
+        const eventData = asObject(parsed.data);
+        if (parsed.event === 'status') {
+          handlers.onStatus?.(typeof eventData?.message === 'string' ? eventData.message : '');
+        } else if (parsed.event === 'context') {
+          handlers.onContext?.((parsed.data as OntologyAssistantResponse['context']) ?? {});
+        } else if (parsed.event === 'answer_delta') {
+          handlers.onAnswerDelta?.(typeof eventData?.delta === 'string' ? eventData.delta : '');
+        } else if (parsed.event === 'tool_started') {
+          handlers.onToolStarted?.(parsed.data as OntologyAssistantToolStartedEvent);
+        } else if (parsed.event === 'tool_output') {
+          handlers.onToolOutput?.(parsed.data as OntologyAssistantToolOutputEvent);
+        } else if (parsed.event === 'tool_finished') {
+          handlers.onToolFinished?.(parsed.data as OntologyAssistantToolFinishedEvent);
+        } else if (parsed.event === 'complete') {
+          finalResponse = parsed.data as OntologyAssistantResponse;
+          handlers.onComplete?.(finalResponse);
+          return finalResponse;
+        } else if (parsed.event === 'error') {
+          throw new Error(typeof eventData?.message === 'string' ? eventData.message : 'Streaming request failed.');
+        }
+      }
+      boundary = buffer.indexOf('\n\n');
+    }
+
+    if (done) {
+      break;
+    }
+  }
+
+  if (!finalResponse) {
+    throw new Error('Question stream ended before completion.');
+  }
+
+  return finalResponse;
 }
 
 export interface AnalysisResult {
@@ -172,6 +394,7 @@ export interface AboutContent {
     relations: number;
     domains: number;
     levels: number;
+    layers: number;
   };
 }
 
