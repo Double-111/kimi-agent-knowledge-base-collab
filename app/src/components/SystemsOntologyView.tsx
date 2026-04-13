@@ -1,38 +1,96 @@
-import { useEffect, useState } from 'react';
-import { Activity, ArrowRightLeft, Boxes, Circle, Globe, Layers, RefreshCw, Square, Target, Triangle, Zap } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { Activity, ArrowRightLeft, Boxes, Circle, Database, Globe, Layers, RefreshCw, Search, Square, Target, Triangle, Zap } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { fetchSystemAnalysis, type SystemAnalysisData } from '@/lib/api';
-import type { Entity } from '@/types/ontology';
+import type { Entity, KnowledgeLayer } from '@/types/ontology';
 
 interface SystemsOntologyViewProps {
+  entities: Entity[];
   selectedEntity?: Entity | null;
+  onSelectEntity?: (entity: Entity) => void;
 }
 
-export function SystemsOntologyView({ selectedEntity }: SystemsOntologyViewProps) {
+const layerLabels: Record<KnowledgeLayer, string> = {
+  common: 'Common',
+  domain: 'Domain',
+  private: 'Private',
+};
+
+export function SystemsOntologyView({ entities, selectedEntity, onSelectEntity }: SystemsOntologyViewProps) {
   const [analysis, setAnalysis] = useState<SystemAnalysisData | null>(null);
+  const [input, setInput] = useState('');
+  const [analyzedEntity, setAnalyzedEntity] = useState<Entity | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const query = selectedEntity?.name || '存在';
+  const exampleEntities = useMemo(() => {
+    if (selectedEntity) {
+      return [
+        selectedEntity,
+        ...entities
+          .filter((entity) => entity.id !== selectedEntity.id)
+          .sort((left, right) => {
+            const leftScore = Number(left.domain === selectedEntity.domain);
+            const rightScore = Number(right.domain === selectedEntity.domain);
+            return rightScore - leftScore;
+          })
+          .slice(0, 5),
+      ];
+    }
 
-    const load = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const result = await fetchSystemAnalysis(query, selectedEntity?.id);
-        setAnalysis(result);
-      } catch (requestError) {
-        setError(requestError instanceof Error ? requestError.message : '系统分析加载失败');
-      } finally {
-        setLoading(false);
+    return entities.slice(0, 6);
+  }, [entities, selectedEntity]);
+
+  const resolveEntity = (query: string): Entity | null => {
+    const normalized = query.trim().toLowerCase();
+    if (!normalized) {
+      return null;
+    }
+
+    return (
+      entities.find((entity) => entity.name.trim().toLowerCase() === normalized)
+      || entities.find((entity) => entity.name.includes(query.trim()))
+      || null
+    );
+  };
+
+  const handleAnalyze = async (value?: string, preferredEntity?: Entity | null) => {
+    const query = (value ?? input).trim();
+    if (!query) {
+      return;
+    }
+
+    const matchedEntity = preferredEntity || resolveEntity(query);
+
+    setLoading(true);
+    setError(null);
+    try {
+      const result = await fetchSystemAnalysis(query, matchedEntity?.id);
+      setInput(query);
+      setAnalysis(result);
+      setAnalyzedEntity(matchedEntity);
+      if (matchedEntity && matchedEntity.id !== selectedEntity?.id) {
+        onSelectEntity?.(matchedEntity);
       }
-    };
+    } catch (requestError) {
+      setError(requestError instanceof Error ? requestError.message : '系统分析加载失败');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    void load();
-  }, [selectedEntity]);
+  useEffect(() => {
+    if (!selectedEntity) {
+      return;
+    }
+
+    setInput(selectedEntity.name);
+    void handleAnalyze(selectedEntity.name, selectedEntity);
+  }, [selectedEntity?.id]);
 
   if (loading && !analysis) {
     return <div className="text-muted-foreground">正在加载系统分析...</div>;
@@ -48,6 +106,70 @@ export function SystemsOntologyView({ selectedEntity }: SystemsOntologyViewProps
 
   return (
     <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Boxes className="w-5 h-5 text-primary" />
+            系统分析器
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="rounded-2xl border bg-muted/30 p-4">
+            <div className="flex flex-wrap items-center gap-2">
+              <Database className="w-4 h-4 text-primary" />
+              <span className="text-sm font-medium">当前系统视图来自 WiKiMG 节点、关系和派生分析结果</span>
+            </div>
+            {selectedEntity ? (
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Badge variant="outline">{selectedEntity.type}</Badge>
+                <Badge variant="secondary">{selectedEntity.domain}</Badge>
+                <Badge variant={selectedEntity.layer === 'private' ? 'destructive' : 'outline'}>
+                  {layerLabels[selectedEntity.layer]}
+                </Badge>
+                <Badge variant="outline">{selectedEntity.source}</Badge>
+              </div>
+            ) : (
+              <p className="mt-2 text-sm text-muted-foreground">
+                当前还没有选中节点，可以从浏览、图谱或搜索里先选一个实体。
+              </p>
+            )}
+          </div>
+
+          <div className="flex gap-2">
+            <Input
+              placeholder="输入当前 WiKiMG 知识库中的节点名称"
+              value={input}
+              onChange={(event) => setInput(event.target.value)}
+              onKeyDown={(event) => event.key === 'Enter' && void handleAnalyze()}
+              className="flex-1"
+            />
+            <Button onClick={() => void handleAnalyze()} disabled={loading || !input.trim()}>
+              {loading ? '分析中...' : <><Search className="w-4 h-4 mr-2" />分析</>}
+            </Button>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            <span className="text-sm text-muted-foreground">当前 WiKiMG 节点:</span>
+            {exampleEntities.map((entity) => (
+              <Badge
+                key={entity.id}
+                variant="outline"
+                className="cursor-pointer hover:bg-primary/10"
+                onClick={() => void handleAnalyze(entity.name, entity)}
+              >
+                {entity.name}
+              </Badge>
+            ))}
+          </div>
+
+          {error && analysis ? (
+            <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive">
+              {error}
+            </div>
+          ) : null}
+        </CardContent>
+      </Card>
+
       <Card className="border-l-4 border-l-purple-500">
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -57,12 +179,22 @@ export function SystemsOntologyView({ selectedEntity }: SystemsOntologyViewProps
                 系统本体分析：{analysis.entity}
               </CardTitle>
               <p className="text-muted-foreground mt-1">
-                基于后端知识库记录生成的动态系统视图
+                基于 WiKiMG 文档节点与关联语境派生出的动态系统视图
               </p>
             </div>
-            <Badge variant="outline" className="bg-purple-50">
-              系统本体论
-            </Badge>
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge variant="outline" className="bg-purple-50">
+                系统本体论
+              </Badge>
+              {analyzedEntity ? (
+                <>
+                  <Badge variant="secondary">{analyzedEntity.domain}</Badge>
+                  <Badge variant={analyzedEntity.layer === 'private' ? 'destructive' : 'outline'}>
+                    {layerLabels[analyzedEntity.layer]}
+                  </Badge>
+                </>
+              ) : null}
+            </div>
           </div>
         </CardHeader>
 
@@ -210,7 +342,7 @@ export function SystemsOntologyView({ selectedEntity }: SystemsOntologyViewProps
               </Card>
             </TabsContent>
           </Tabs>
-          {error ? <p className="text-sm text-destructive mt-4">{error}</p> : null}
+          {error && !analysis ? <p className="text-sm text-destructive mt-4">{error}</p> : null}
         </CardContent>
       </Card>
     </div>

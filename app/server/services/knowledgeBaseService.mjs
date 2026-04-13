@@ -30,6 +30,13 @@ export class KnowledgeBaseService {
   }
 
   async collectChatContext(question, entityId) {
+    if (typeof this.repository.getChatContext === "function") {
+      const specializedContext = await this.repository.getChatContext(question, entityId);
+      if (specializedContext) {
+        return specializedContext;
+      }
+    }
+
     const knowledgeGraph = await this.repository.getKnowledgeGraph();
     const entity = entityId ? knowledgeGraph.entity_index[entityId] : null;
     const related = entity ? (await this.repository.getRelatedEntities(entityId)).slice(0, 6) : [];
@@ -81,6 +88,7 @@ export class KnowledgeBaseService {
         relations: knowledgeGraph.statistics.total_relations,
         domains: knowledgeGraph.statistics.domains.length,
         levels: knowledgeGraph.statistics.levels.length,
+        layers: Array.isArray(knowledgeGraph.statistics.layers) ? knowledgeGraph.statistics.layers.length : 0,
       },
     };
   }

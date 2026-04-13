@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ZoomIn, ZoomOut, Maximize2, Network } from 'lucide-react';
-import type { Entity, CrossReference } from '@/types/ontology';
+import type { Entity, CrossReference, KnowledgeLayer } from '@/types/ontology';
 
 interface KnowledgeGraphProps {
   entities: Entity[];
@@ -46,42 +46,45 @@ export function KnowledgeGraph({
 
   const width = 800;
   const height = 600;
-
-  // 颜色映射
-  const domainColors: Record<string, string> = {
-    '存在论': '#3b82f6',
-    '范畴论': '#8b5cf6',
-    '属性论': '#10b981',
-    '关系论': '#f59e0b',
-    '过程与变化': '#ef4444',
-    '形而上学基本问题': '#ec4899',
-    'upper_ontologies': '#6366f1',
-    'basic_formal_relations': '#14b8a6',
-    'property_system': '#f97316',
-    'ontology_methodology': '#84cc16',
-    'logical_foundations': '#06b6d4',
-    'ontology_languages': '#a855f7',
-    '物理层': '#0ea5e9',
-    '化学层': '#22c55e',
-    '生物层': '#eab308',
-    '认知层': '#a855f7',
-    '社会层': '#f43f5e',
-    '信息层': '#6366f1',
+  const initialOrbitRadius = Math.min(260, 180 + entities.length * 4);
+  const repulsionStrength = 2800;
+  const targetLinkDistance = 135;
+  const springStrength = 0.006;
+  const centerPullStrength = 0.0005;
+  const velocityDamping = 0.86;
+  const palette = ['#2563eb', '#7c3aed', '#059669', '#ea580c', '#db2777', '#0f766e', '#4f46e5', '#ca8a04'];
+  const uniqueDomains = [...new Set(entities.map((entity) => entity.domain).filter(Boolean))];
+  const domainColors = uniqueDomains.reduce<Record<string, string>>((accumulator, domain, index) => {
+    accumulator[domain] = palette[index % palette.length];
+    return accumulator;
+  }, {});
+  const layerStrokeColors: Record<KnowledgeLayer, string> = {
+    common: '#0f766e',
+    domain: '#334155',
+    private: '#e11d48',
+  };
+  const layerLabels: Record<KnowledgeLayer, string> = {
+    common: 'Common',
+    domain: 'Domain',
+    private: 'Private',
   };
 
   // 初始化节点和链接
   useEffect(() => {
-    if (entities.length === 0) return;
+    if (entities.length === 0) {
+      setNodes([]);
+      setLinks([]);
+      return;
+    }
 
     // 创建节点
     const initialNodes: Node[] = entities.map((entity, index) => {
       const angle = (index / entities.length) * 2 * Math.PI;
-      const radius = 200;
       return {
         id: entity.id,
         name: entity.name,
-        x: width / 2 + Math.cos(angle) * radius,
-        y: height / 2 + Math.sin(angle) * radius,
+        x: width / 2 + Math.cos(angle) * initialOrbitRadius,
+        y: height / 2 + Math.sin(angle) * initialOrbitRadius,
         vx: 0,
         vy: 0,
         radius: entity.id === selectedEntityId ? 25 : 18,
@@ -115,7 +118,7 @@ export function KnowledgeGraph({
             const dx = newNodes[j].x - newNodes[i].x;
             const dy = newNodes[j].y - newNodes[i].y;
             const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-            const force = 2000 / (dist * dist);
+            const force = repulsionStrength / (dist * dist);
             const fx = (dx / dist) * force;
             const fy = (dy / dist) * force;
             
@@ -134,7 +137,7 @@ export function KnowledgeGraph({
             const dx = targetNode.x - sourceNode.x;
             const dy = targetNode.y - sourceNode.y;
             const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-            const force = (dist - 100) * 0.01;
+            const force = (dist - targetLinkDistance) * springStrength;
             const fx = (dx / dist) * force;
             const fy = (dy / dist) * force;
             
@@ -149,15 +152,15 @@ export function KnowledgeGraph({
         newNodes.forEach(node => {
           const dx = width / 2 - node.x;
           const dy = height / 2 - node.y;
-          node.vx += dx * 0.001;
-          node.vy += dy * 0.001;
+          node.vx += dx * centerPullStrength;
+          node.vy += dy * centerPullStrength;
         });
 
         // 更新位置
         newNodes.forEach(node => {
           if (node.id !== draggedNode) {
-            node.vx *= 0.9; // 阻尼
-            node.vy *= 0.9;
+            node.vx *= velocityDamping; // 阻尼
+            node.vy *= velocityDamping;
             node.x += node.vx;
             node.y += node.vy;
             
@@ -305,10 +308,13 @@ export function KnowledgeGraph({
                 <circle
                   r={node.radius}
                   fill={node.color}
-                  stroke="white"
-                  strokeWidth={2}
+                  stroke={layerStrokeColors[node.entity.layer]}
+                  strokeWidth={node.entity.layer === 'private' ? 4 : 2.5}
                   className="hover:opacity-80 transition-opacity"
                 />
+                <title>
+                  {`${node.entity.name}\n领域: ${node.entity.domain}\n存储层: ${layerLabels[node.entity.layer]}\n${node.entity.definition}`}
+                </title>
                 {/* 节点标签 */}
                 <text
                   textAnchor="middle"
@@ -326,7 +332,7 @@ export function KnowledgeGraph({
         {/* 图例 */}
         <div className="p-4 border-t bg-muted/30">
           <div className="flex flex-wrap gap-2">
-            {Object.entries(domainColors).slice(0, 8).map(([domain, color]) => (
+            {Object.entries(domainColors).map(([domain, color]) => (
               <Badge key={domain} variant="outline" className="flex items-center gap-1">
                 <div 
                   className="w-3 h-3 rounded-full" 
@@ -335,7 +341,17 @@ export function KnowledgeGraph({
                 <span className="text-xs">{domain}</span>
               </Badge>
             ))}
-            <Badge variant="outline" className="text-xs">+{Object.keys(domainColors).length - 8} 更多</Badge>
+          </div>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {Object.entries(layerLabels).map(([layer, label]) => (
+              <Badge key={layer} variant={layer === 'private' ? 'destructive' : 'outline'} className="flex items-center gap-1">
+                <div
+                  className="w-3 h-3 rounded-full border-2 bg-white"
+                  style={{ borderColor: layerStrokeColors[layer as KnowledgeLayer] }}
+                />
+                <span className="text-xs">{label}</span>
+              </Badge>
+            ))}
           </div>
         </div>
       </CardContent>

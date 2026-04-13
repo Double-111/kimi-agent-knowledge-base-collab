@@ -1,5 +1,32 @@
 # React + TypeScript + Vite
 
+## 快速启动 WiKiMG 后端
+
+在 `app` 目录下执行：
+
+```bash
+./start-wikimg-backend.sh
+```
+
+或者：
+
+```bash
+npm run server:wikimg
+```
+
+可选环境变量：
+
+```bash
+PORT=8788 WIKIMG_ROOT=/Users/qiuboyu/CodeLearning/FJY/Ontology_Factory ./start-wikimg-backend.sh
+```
+
+默认值：
+
+- `KNOWLEDGE_BASE_PROVIDER=wikimg`
+- `WIKIMG_PROFILE=kimi`
+- `WIKIMG_ROOT=../../Ontology_Factory`（相对 `app` 自动解析）
+- `PORT=8787`
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:

@@ -6,7 +6,12 @@ import path from "node:path";
 import { createAppServices } from "./server/createAppServices.mjs";
 
 const PORT = Number(process.env.PORT || 8787);
-const { knowledgeBaseService, qagentService, appRoot } = createAppServices();
+const {
+  knowledgeBaseService,
+  assistantSessionStateService,
+  qagentService,
+  appRoot,
+} = createAppServices();
 
 function sendJson(res, status, payload) {
   res.writeHead(status, {
@@ -26,6 +31,27 @@ function sendText(res, status, text, contentType = "text/plain; charset=utf-8") 
     "Access-Control-Allow-Headers": "Content-Type",
   });
   res.end(text);
+}
+
+function openSse(res) {
+  res.writeHead(200, {
+    "Content-Type": "text/event-stream; charset=utf-8",
+    "Cache-Control": "no-cache, no-transform",
+    Connection: "keep-alive",
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type",
+  });
+  res.write(": connected\n\n");
+}
+
+function writeSse(res, event, payload) {
+  if (res.writableEnded) {
+    return;
+  }
+
+  res.write(`event: ${event}\n`);
+  res.write(`data: ${JSON.stringify(payload)}\n\n`);
 }
 
 async function parseBody(req) {
@@ -53,6 +79,23 @@ function getContentType(filePath) {
   if (filePath.endsWith(".json")) return "application/json; charset=utf-8";
   if (filePath.endsWith(".svg")) return "image/svg+xml";
   return "application/octet-stream";
+}
+
+function parseConversationHistory(value) {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value
+    .map((item) => (
+      item && typeof item === "object"
+        ? {
+            question: typeof item.question === "string" ? item.question : "",
+            answer: typeof item.answer === "string" ? item.answer : "",
+          }
+        : null
+    ))
+    .filter(Boolean);
 }
 
 const server = createServer(async (req, res) => {
@@ -167,6 +210,10 @@ const server = createServer(async (req, res) => {
       const body = await parseBody(req);
       const question = typeof body.question === "string" ? body.question.trim() : "";
       const entityId = typeof body.entityId === "string" ? body.entityId : undefined;
+      const conversationId = typeof body.conversationId === "string" ? body.conversationId : undefined;
+      const businessPrompt = typeof body.businessPrompt === "string" ? body.businessPrompt : undefined;
+      const modelName = typeof body.modelName === "string" ? body.modelName : undefined;
+      const conversationHistory = parseConversationHistory(body.conversationHistory);
 
       if (!question) {
         sendJson(res, 400, { error: "question is required" });
@@ -174,7 +221,12 @@ const server = createServer(async (req, res) => {
       }
 
       const context = await knowledgeBaseService.collectChatContext(question, entityId);
-      const result = await qagentService.ask(question, context);
+      const result = await qagentService.ask(question, context, {
+        conversationId,
+        businessPrompt,
+        modelName,
+        conversationHistory,
+      });
 
       if (!result.ok) {
         sendJson(res, 502, {
@@ -192,6 +244,108 @@ const server = createServer(async (req, res) => {
         raw: result.raw,
         stderr: result.stderr,
       });
+      return;
+    }
+
+    if (req.method === "GET" && url.pathname === "/api/chat/state") {
+      sendJson(res, 200, await assistantSessionStateService.load());
+      return;
+    }
+
+    if (req.method === "POST" && url.pathname === "/api/chat/state") {
+      const body = await parseBody(req);
+      sendJson(res, 200, await assistantSessionStateService.save(body));
+      return;
+    }
+
+    if (req.method === "POST" && url.pathname === "/api/chat/stream") {
+      const body = await parseBody(req);
+      const question = typeof body.question === "string" ? body.question.trim() : "";
+      const entityId = typeof body.entityId === "string" ? body.entityId : undefined;
+      const conversationId = typeof body.conversationId === "string" ? body.conversationId : undefined;
+      const businessPrompt = typeof body.businessPrompt === "string" ? body.businessPrompt : undefined;
+      const modelName = typeof body.modelName === "string" ? body.modelName : undefined;
+      const conversationHistory = parseConversationHistory(body.conversationHistory);
+
+      if (!question) {
+        sendJson(res, 400, { error: "question is required" });
+        return;
+      }
+
+      const context = await knowledgeBaseService.collectChatContext(question, entityId);
+      const abortController = new AbortController();
+      let streamCompleted = false;
+
+      res.on("close", () => {
+        if (!streamCompleted) {
+          abortController.abort();
+        }
+      });
+
+      openSse(res);
+      writeSse(res, "context", context);
+      writeSse(res, "status", {
+        message: "已整理知识库上下文，准备连接 Agent CLI...",
+      });
+
+      try {
+        const result = await qagentService.askStream(
+          question,
+          context,
+          {
+            onStatus(message) {
+              writeSse(res, "status", { message });
+            },
+            onAnswerDelta(delta) {
+              writeSse(res, "answer_delta", { delta });
+            },
+            onToolStarted(toolRun) {
+              writeSse(res, "tool_started", toolRun);
+            },
+            onToolOutput(toolOutput) {
+              writeSse(res, "tool_output", toolOutput);
+            },
+            onToolFinished(toolRun) {
+              writeSse(res, "tool_finished", toolRun);
+            },
+          },
+          {
+            conversationId,
+            businessPrompt,
+            modelName,
+            conversationHistory,
+            signal: abortController.signal,
+          }
+        );
+
+        if (!result.ok) {
+          writeSse(res, "error", {
+            message: result.error,
+            context,
+            raw: result.raw,
+            stderr: result.stderr,
+          });
+          res.end();
+          return;
+        }
+
+        writeSse(res, "complete", {
+          answer: result.answer,
+          context,
+          raw: result.raw,
+          stderr: result.stderr,
+        });
+        streamCompleted = true;
+        res.end();
+      } catch (error) {
+        if (!res.writableEnded) {
+          writeSse(res, "error", {
+            message: error instanceof Error ? error.message : "Unknown server error",
+          });
+          streamCompleted = true;
+          res.end();
+        }
+      }
       return;
     }
 

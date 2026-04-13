@@ -30,15 +30,52 @@ import {
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';
-import type { Entity } from '@/types/ontology';
+import type { Entity, KnowledgeLayer, KnowledgeGraphData } from '@/types/ontology';
+
+const LAYER_FILTERS: Array<{ value: 'all' | KnowledgeLayer; label: string }> = [
+  { value: 'all', label: '全部层' },
+  { value: 'common', label: 'Common' },
+  { value: 'domain', label: 'Domain' },
+  { value: 'private', label: 'Private' },
+];
+
+function buildFilteredStatistics(
+  knowledgeGraph: KnowledgeGraphData | null,
+  entities: Entity[],
+  crossReferences: Array<{ source: string; target: string }>,
+) {
+  if (!knowledgeGraph) {
+    return null;
+  }
+
+  const domains = [...new Set(entities.map((entity) => entity.domain).filter(Boolean))].sort();
+  const levels = [...new Set(entities.map((entity) => entity.level).filter((level): level is number => typeof level === 'number'))].sort((left, right) => left - right);
+  const sources = [...new Set(entities.map((entity) => entity.source).filter(Boolean))].sort();
+  const layers = [...new Set(entities.map((entity) => entity.layer).filter(Boolean))] as KnowledgeLayer[];
+  const orderedLayers = ['common', 'domain', 'private'].filter((layer) => layers.includes(layer as KnowledgeLayer)) as KnowledgeLayer[];
+  const layerCounts = orderedLayers.reduce<Partial<Record<KnowledgeLayer, number>>>((accumulator, layer) => {
+    accumulator[layer] = entities.filter((entity) => entity.layer === layer).length;
+    return accumulator;
+  }, {});
+
+  return {
+    ...knowledgeGraph.statistics,
+    total_entities: entities.length,
+    total_relations: crossReferences.length,
+    domains,
+    levels,
+    sources,
+    layers: orderedLayers,
+    layer_counts: layerCounts,
+  };
+}
 
 function App() {
   const { 
     knowledgeGraph, 
     loading, 
     error, 
-    searchEntities, 
-    getRelatedEntities 
+    searchEntities
   } = useOntologyData();
   
   const entities = knowledgeGraph ? Object.values(knowledgeGraph.entity_index) : [];
@@ -47,17 +84,46 @@ function App() {
   const [selectedEntity, setSelectedEntity] = useState<Entity | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('browse');
+  const [selectedLayer, setSelectedLayer] = useState<'all' | KnowledgeLayer>('all');
+
+  const filteredEntities = entities.filter((entity) => (
+    selectedLayer === 'all' || entity.layer === selectedLayer
+  ));
+  const visibleEntityIds = new Set(filteredEntities.map((entity) => entity.id));
+  const filteredCrossReferences = crossReferences.filter((reference) => (
+    visibleEntityIds.has(reference.source) && visibleEntityIds.has(reference.target)
+  ));
+  const filteredStatistics = buildFilteredStatistics(knowledgeGraph, filteredEntities, filteredCrossReferences);
   
   // 数据加载完成后自动选择第一个实体
   useEffect(() => {
-    if (entities.length > 0 && !selectedEntity) {
-      setSelectedEntity(entities[0]);
+    if (filteredEntities.length === 0) {
+      if (selectedEntity) {
+        setSelectedEntity(null);
+      }
+      return;
     }
-  }, [entities, selectedEntity]);
+
+    if (!selectedEntity || !filteredEntities.some((entity) => entity.id === selectedEntity.id)) {
+      setSelectedEntity(filteredEntities[0]);
+    }
+  }, [filteredEntities, selectedEntity]);
   
-  const relatedEntities = selectedEntity 
-    ? getRelatedEntities(selectedEntity.id)
+  const relatedEntities = selectedEntity
+    ? filteredCrossReferences
+        .map((reference) => {
+          const relatedId = reference.source === selectedEntity.id ? reference.target : (
+            reference.target === selectedEntity.id ? reference.source : null
+          );
+          return relatedId ? filteredEntities.find((entity) => entity.id === relatedId) || null : null;
+        })
+        .filter((entity): entity is Entity => Boolean(entity))
     : [];
+
+  const handleSearch = async (query: string) => {
+    const results = await searchEntities(query);
+    return results.filter((entity) => selectedLayer === 'all' || entity.layer === selectedLayer);
+  };
 
   const handleSelectEntity = (entity: Entity) => {
     setSelectedEntity(entity);
@@ -69,7 +135,7 @@ function App() {
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4" />
-          <p className="text-muted-foreground">加载本体论知识库...</p>
+          <p className="text-muted-foreground">正在加载 WiKiMG 多层知识图谱...</p>
         </div>
       </div>
     );
@@ -105,17 +171,21 @@ function App() {
             <div className="hidden md:flex items-center gap-2">
               <Badge variant="outline" className="flex items-center gap-1">
                 <GitBranch className="w-3 h-3" />
-                {entities.length} 实体
+                {filteredEntities.length} 实体
               </Badge>
               <Badge variant="outline" className="flex items-center gap-1">
                 <Network className="w-3 h-3" />
-                {crossReferences.length} 关系
+                {filteredCrossReferences.length} 关系
+              </Badge>
+              <Badge variant="outline" className="flex items-center gap-1">
+                <Layers className="w-3 h-3" />
+                {selectedLayer === 'all' ? '全部层' : selectedLayer}
               </Badge>
             </div>
             
             <div className="hidden md:block w-72">
               <SearchPanel 
-                onSearch={searchEntities}
+                onSearch={handleSearch}
                 onSelectEntity={handleSelectEntity}
               />
             </div>
@@ -132,8 +202,8 @@ function App() {
                 </div>
                 <div className="p-4">
                   <OntologyBrowser 
-                    entities={entities}
-                    crossReferences={crossReferences}
+                    entities={filteredEntities}
+                    crossReferences={filteredCrossReferences}
                     onSelectEntity={handleSelectEntity}
                     selectedEntityId={selectedEntity?.id}
                   />
@@ -146,6 +216,21 @@ function App() {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-6">
+        <div className="mb-6 flex flex-wrap items-center gap-2 rounded-2xl border bg-card p-3">
+          <span className="text-sm text-muted-foreground">按存储层过滤</span>
+          {LAYER_FILTERS.map((option) => (
+            <Button
+              key={option.value}
+              type="button"
+              variant={selectedLayer === option.value ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setSelectedLayer(option.value)}
+            >
+              {option.label}
+            </Button>
+          ))}
+        </div>
+
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid w-full grid-cols-9 lg:w-auto lg:inline-grid">
             <TabsTrigger value="browse" className="flex items-center gap-2">
@@ -192,13 +277,13 @@ function App() {
                 <div>
                   <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs">
                     <BookOpen className="w-3.5 h-3.5" />
-                    知识库主阅读区
+                    WiKiMG 主阅读区
                   </div>
                   <h2 className="mt-4 text-2xl font-semibold lg:text-3xl">
-                    左侧直接看概念摘要，右侧同步展开完整详情
+                    用存储层过滤知识范围，再查看节点详情与关系网络
                   </h2>
                   <p className="mt-3 max-w-2xl text-sm text-slate-300 lg:text-base">
-                    页面打开后，左侧会直接列出几个核心概念的定义摘要，右侧保留主阅读区。你不需要先操作，就能同时看到概览和详细解释。
+                    当前页面会根据上方的层过滤展示 `common`、`domain`、`private` 中的节点。左侧用于快速比较代表节点，右侧会同步展开选中节点的定义、属性、来源和关联关系。
                   </p>
                 </div>
 
@@ -208,12 +293,12 @@ function App() {
                     <div className="mt-2 text-lg font-semibold">{selectedEntity?.name || '未选择'}</div>
                   </div>
                   <div className="rounded-2xl bg-white/10 p-4">
-                    <div className="text-xs text-slate-300">知识节点</div>
-                    <div className="mt-2 text-lg font-semibold">{entities.length}</div>
+                    <div className="text-xs text-slate-300">当前层节点</div>
+                    <div className="mt-2 text-lg font-semibold">{filteredEntities.length}</div>
                   </div>
                   <div className="rounded-2xl bg-white/10 p-4">
-                    <div className="text-xs text-slate-300">概念关系</div>
-                    <div className="mt-2 text-lg font-semibold">{crossReferences.length}</div>
+                    <div className="text-xs text-slate-300">当前层关系</div>
+                    <div className="mt-2 text-lg font-semibold">{filteredCrossReferences.length}</div>
                   </div>
                 </div>
               </div>
@@ -222,8 +307,8 @@ function App() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
               <div className="hidden lg:block lg:col-span-4">
                 <OntologyBrowser 
-                  entities={entities}
-                  crossReferences={crossReferences}
+                  entities={filteredEntities}
+                  crossReferences={filteredCrossReferences}
                   onSelectEntity={handleSelectEntity}
                   selectedEntityId={selectedEntity?.id}
                 />
@@ -233,18 +318,18 @@ function App() {
                 <div className="mb-4 grid gap-3 md:grid-cols-3">
                   <div className="rounded-2xl border bg-card p-4">
                     <div className="text-xs text-muted-foreground">当前阅读</div>
-                    <div className="mt-2 font-medium">{selectedEntity?.name || '系统已默认选中一个概念'}</div>
-                    <p className="mt-1 text-sm text-muted-foreground">打开页面后就可以直接看，不需要先操作。</p>
+                    <div className="mt-2 font-medium">{selectedEntity?.name || '当前过滤范围内暂无可阅读节点'}</div>
+                    <p className="mt-1 text-sm text-muted-foreground">右侧详情会跟随当前选中节点更新，并保留完整的定义、属性和关系信息。</p>
+                  </div>
+                  <div className="rounded-2xl border bg-card p-4">
+                    <div className="text-xs text-muted-foreground">当前过滤</div>
+                    <div className="mt-2 font-medium">{selectedLayer === 'all' ? '全部层' : selectedLayer}</div>
+                    <p className="mt-1 text-sm text-muted-foreground">浏览、图谱、统计会一起跟着这个层过滤同步变化。</p>
                   </div>
                   <div className="rounded-2xl border bg-card p-4">
                     <div className="text-xs text-muted-foreground">左侧速览</div>
-                    <div className="mt-2 font-medium">多个概念摘要直接常驻显示</div>
-                    <p className="mt-1 text-sm text-muted-foreground">不用点开，也能先扫一眼差异和主题。</p>
-                  </div>
-                  <div className="rounded-2xl border bg-card p-4">
-                    <div className="text-xs text-muted-foreground">切换方式</div>
-                    <div className="mt-2 font-medium">点击“设为主阅读”时才切换右侧详情</div>
-                    <p className="mt-1 text-sm text-muted-foreground">不点也能看摘要，想深入时再切换主阅读区。</p>
+                    <div className="mt-2 font-medium">优先展示与当前节点接近的候选内容</div>
+                    <p className="mt-1 text-sm text-muted-foreground">你可以先横向比较定义和领域，再决定把哪个节点切到主阅读区。</p>
                   </div>
                 </div>
 
@@ -262,14 +347,19 @@ function App() {
           </TabsContent>
 
           <TabsContent value="analyzer" className="space-y-6">
-            <OntologyAnalyzer onSelectConcept={(concept) => {
-              // 可以在这里添加将概念链接到知识库的逻辑
-              console.log('Selected concept:', concept);
-            }} />
+            <OntologyAnalyzer
+              entities={filteredEntities}
+              selectedEntity={selectedEntity}
+              onSelectEntity={handleSelectEntity}
+            />
           </TabsContent>
 
           <TabsContent value="systems" className="space-y-6">
-            <SystemsOntologyView selectedEntity={selectedEntity} />
+            <SystemsOntologyView
+              entities={filteredEntities}
+              selectedEntity={selectedEntity}
+              onSelectEntity={handleSelectEntity}
+            />
           </TabsContent>
 
           <TabsContent value="editor" className="space-y-6">
@@ -284,8 +374,8 @@ function App() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2">
                 <KnowledgeGraph 
-                  entities={entities}
-                  crossReferences={crossReferences}
+                  entities={filteredEntities}
+                  crossReferences={filteredCrossReferences}
                   onSelectEntity={handleSelectEntity}
                   selectedEntityId={selectedEntity?.id}
                 />
@@ -301,7 +391,7 @@ function App() {
           </TabsContent>
 
           <TabsContent value="stats">
-            <StatsPanel statistics={knowledgeGraph?.statistics || null} />
+            <StatsPanel statistics={filteredStatistics} />
             
             <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="bg-card border rounded-lg p-6">

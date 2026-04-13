@@ -52,7 +52,7 @@ export function AboutKnowledgeBase() {
           <CardDescription className="text-slate-300">{content.platform.vision}</CardDescription>
           <p className="max-w-3xl text-sm leading-6 text-slate-300">{content.platform.description}</p>
         </CardHeader>
-        <CardContent className="grid gap-4 p-6 md:grid-cols-4">
+        <CardContent className="grid gap-4 p-6 md:grid-cols-5">
           <div className="rounded-2xl border bg-card p-4">
             <div className="text-xs text-muted-foreground">数据源</div>
             <div className="mt-2 font-semibold">{content.metrics.provider}</div>
@@ -68,6 +68,10 @@ export function AboutKnowledgeBase() {
           <div className="rounded-2xl border bg-card p-4">
             <div className="text-xs text-muted-foreground">领域 / 层级</div>
             <div className="mt-2 font-semibold">{content.metrics.domains} / {content.metrics.levels}</div>
+          </div>
+          <div className="rounded-2xl border bg-card p-4">
+            <div className="text-xs text-muted-foreground">存储层</div>
+            <div className="mt-2 font-semibold">{content.metrics.layers}</div>
           </div>
         </CardContent>
       </Card>
@@ -99,7 +103,7 @@ export function AboutKnowledgeBase() {
               <Route className="h-5 w-5 text-primary" />
               建议使用路径
             </CardTitle>
-            <CardDescription>给第一次接触这个平台的用户一个很直白的使用顺序。</CardDescription>
+            <CardDescription>从浏览、分析到编辑，按这个顺序可以更快理解这套知识平台的能力边界。</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
             {content.workflow.map((step, index) => (
