@@ -5,8 +5,10 @@ import {
   GitBranch, 
   BarChart3,
   Database,
-  Network
+  Network,
+  FolderTree
 } from 'lucide-react';
+import type { KnowledgeLayer } from '@/types/ontology';
 
 interface StatsPanelProps {
   statistics: {
@@ -15,14 +17,22 @@ interface StatsPanelProps {
     domains: string[];
     levels: number[];
     sources?: string[];
+    layers: KnowledgeLayer[];
+    layer_counts: Partial<Record<KnowledgeLayer, number>>;
   } | null;
 }
+
+const layerLabels: Record<KnowledgeLayer, string> = {
+  common: 'Common',
+  domain: 'Domain',
+  private: 'Private',
+};
 
 export function StatsPanel({ statistics }: StatsPanelProps) {
   if (!statistics) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {[1, 2, 3, 4].map((i) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4">
+        {[1, 2, 3, 4, 5].map((i) => (
           <Card key={i} className="animate-pulse">
             <CardContent className="h-24" />
           </Card>
@@ -59,12 +69,19 @@ export function StatsPanel({ statistics }: StatsPanelProps) {
       icon: <GitBranch className="w-5 h-5" />,
       color: 'bg-orange-500/10 text-orange-600',
       description: '本体论层次'
+    },
+    {
+      title: '存储层',
+      value: statistics.layers.length,
+      icon: <FolderTree className="w-5 h-5" />,
+      color: 'bg-rose-500/10 text-rose-600',
+      description: 'Common / Domain / Private'
     }
   ];
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4">
         {stats.map((stat, index) => (
           <Card key={index}>
             <CardContent className="p-6">
@@ -124,6 +141,17 @@ export function StatsPanel({ statistics }: StatsPanelProps) {
                     <div className="w-4 h-px bg-border" />
                   )}
                 </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-4">
+            <h4 className="text-sm font-medium mb-2">存储层分布</h4>
+            <div className="flex flex-wrap gap-2">
+              {statistics.layers.map((layer) => (
+                <Badge key={layer} variant={layer === 'private' ? 'destructive' : 'outline'} className="px-3 py-1">
+                  {layerLabels[layer]} · {statistics.layer_counts[layer] || 0}
+                </Badge>
               ))}
             </div>
           </div>
